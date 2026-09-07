@@ -1,0 +1,41 @@
+import datetime
+import tempfile
+import unittest
+from pathlib import Path
+
+class ImprovementTests(unittest.TestCase):
+    def test_stops_speed_distance_gap_and_threshold(self):
+        from fit_pipeline import detect_breakpoints
+        records = [(38, 27, t, 0.0) for t in range(0, 151, 10)]
+        self.assertEqual(detect_breakpoints(records)[0]['duration_s'], 150)
+        self.assertEqual(len(detect_breakpoints([(a,b,t,None) for a,b,t,s in records])), 1)
+        self.assertEqual(detect_breakpoints(records[:13]), [])
+        self.assertEqual(detect_breakpoints([(38,27,0,0),(38,27,180,0)]), [])
+        self.assertEqual(detect_breakpoints([(38,27,t,1) for t in range(151)]), [])
+
+    def test_routine_history_future_and_exact_precedence(self):
+        from fit_pipeline import load_routine_rules, muscle_summary
+        rules = load_routine_rules()
+        def workout(date):
+            return {'start_time': date, 'sport':'training'}
+        rules['sessions'] = [{'when':'2026-09-09','routines':['Leg']},
+                             {'when':'2026-09-09T10:00:00+03:00','routines':['Neck']}]
+        result = muscle_summary([workout('2026-09-07T10:00:00+03:00'),workout('2026-09-09T10:00:00+03:00'),workout('2026-09-10T10:00:00+03:00')], rules)
+        strength = result['strength']
+        self.assertEqual(strength['matched_sessions'], 2)
+        self.assertEqual(strength['unmatched_sessions'], 1)
+        self.assertEqual(strength['all_time']['neck-flexors'], 2)
+        self.assertEqual(strength['all_time']['quads'], 1)
+        self.assertEqual(strength['recent_28d']['quads'], 1)
+
+    def test_cluster_projection_and_breakpoint_payload(self):
+        from fit_pipeline import build_routes
+        pts = [(38+i*.0001,27+i*.0001) for i in range(20)]
+        ws = [{'pts':pts,'sport':'running','breakpoints':[{'lat':38.001,'lon':27.001,'duration_s':130}]} for _ in range(3)]
+        cluster = build_routes(ws)['clusters'][0]
+        self.assertEqual(len(cluster['breakpoints']),3)
+        self.assertEqual(cluster['paths'][0]['d'],cluster['paths'][1]['d'])
+        self.assertTrue(all(0 <= p['x'] <= cluster['w'] for p in cluster['breakpoints']))
+
+if __name__ == '__main__':
+    unittest.main()

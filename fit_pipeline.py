@@ -77,10 +77,120 @@ def decoupling(ts, spd, hr):
     return round((ef1 / ef2 - 1) * 100, 1) if ef2 else None
 
 
+def detect_breakpoints(records):
+    """Likely stops: speed <0.5 m/s for >120s; gaps >30s break evidence.
+
+    Records are (lat, lon, epoch seconds, speed or None). Distance fallback
+    uses consecutive fixes; never infer a stop across missing GPS coverage.
+    """
+    out, slow = [], []
+    def finish():
+        if len(slow) > 1 and slow[-1][2] - slow[0][2] > 120:
+            out.append({'lat': sum(p[0] for p in slow)/len(slow),
+                        'lon': sum(p[1] for p in slow)/len(slow),
+                        'duration_s': round(slow[-1][2]-slow[0][2])})
+    for i, p in enumerate(records):
+        prev = records[i-1] if i else None
+        gap = p[2]-prev[2] if prev else None
+        if gap is not None and not 0 < gap <= 30:
+            finish(); slow = []
+            continue
+        speed = p[3]
+        if speed is None and prev and gap:
+            dy = math.radians(p[0]-prev[0])
+            dx = math.radians(p[1]-prev[1])*math.cos(math.radians((p[0]+prev[0])/2))
+            speed = math.hypot(dx, dy)*6371000/gap
+        if speed is not None and speed < 0.5:
+            if not slow and prev and p[3] is None:
+                slow.append(prev)
+            slow.append(p)
+        else:
+            finish(); slow = []
+    finish()
+    return out
+
+
+def load_routine_rules(path=None):
+    import re
+    from pathlib import Path
+    from zoneinfo import ZoneInfo
+    text = Path(path or os.path.join(HERE, 'routines.md')).read_text()
+    blocks = re.findall(r'```json\s*\n(.*?)\n```', text, re.S)
+    if len(blocks) != 1:
+        raise ValueError('routines.md must contain exactly one JSON block')
+    rules = json.loads(blocks[0])
+    if rules['version'] != 1:
+        raise ValueError('unsupported routine schema')
+    ZoneInfo(rules['timezone'])
+    datetime.date.fromisoformat(rules['historical_before'])
+    for name, item in rules['routines'].items():
+        if item['category'] not in ('strength', 'mobility') or not item['muscles']:
+            raise ValueError('invalid routine: '+name)
+        if any(not re.fullmatch(r'[a-z]+(?:-[a-z]+)*', m) for m in item['muscles']):
+            raise ValueError('invalid muscle identifier')
+    for category in ('strength', 'mobility'):
+        for name in rules['historical'][category]:
+            if rules['routines'][name]['category'] != category:
+                raise ValueError('historical category mismatch')
+    for entry in rules['sessions']:
+        when = entry['when']
+        if len(when) == 10:
+            datetime.date.fromisoformat(when)
+        elif datetime.datetime.fromisoformat(when).tzinfo is None:
+            raise ValueError('routine timestamps require timezone')
+        if not entry['routines'] or any(n not in rules['routines'] for n in entry['routines']):
+            raise ValueError('unknown or empty routine')
+    return rules
+
+
+def muscle_summary(ws, rules):
+    from zoneinfo import ZoneInfo
+    zone = ZoneInfo(rules['timezone'])
+    def local(w):
+        t = dt(w)
+        if t.tzinfo is None:
+            raise ValueError('workout timestamps require timezone for routine matching')
+        return t.astimezone(zone)
+    if not ws:
+        return {'as_of': None, 'recent_from': None, 'unit': 'attributed sessions',
+                'strength': {}, 'mobility': {}}
+    end = max(local(w).date() for w in ws)
+    start = end - datetime.timedelta(days=27)
+    result = {'as_of': end.isoformat(), 'recent_from': start.isoformat(), 'unit':'attributed sessions'}
+    for category in ('strength', 'mobility'):
+        muscles = sorted({m for r in rules['routines'].values() if r['category']==category for m in r['muscles']})
+        summary = {'all_time':dict.fromkeys(muscles,0), 'recent_28d':dict.fromkeys(muscles,0),
+                   'matched_sessions':0, 'unmatched_sessions':0, 'historical_sessions':0, 'logged_sessions':0}
+        for w in ws:
+            if sport_category(w) != ('mind_and_body' if category=='mobility' else category):
+                continue
+            t = local(w)
+            exact, dates = [], []
+            for entry in rules['sessions']:
+                when = entry['when']
+                if len(when)==10 and when==t.date().isoformat(): dates.extend(entry['routines'])
+                elif len(when)>10 and datetime.datetime.fromisoformat(when)==t: exact.extend(entry['routines'])
+            names = exact or dates
+            historical = not names and t.date().isoformat() < rules['historical_before']
+            if historical: names = rules['historical'][category]
+            assigned = {m for n in names if rules['routines'][n]['category']==category for m in rules['routines'][n]['muscles']}
+            if not assigned:
+                summary['unmatched_sessions'] += 1
+                continue
+            summary['matched_sessions'] += 1
+            summary['historical_sessions' if historical else 'logged_sessions'] += 1
+            for m in assigned:
+                summary['all_time'][m] += 1
+                if start <= t.date() <= end: summary['recent_28d'][m] += 1
+        result[category] = summary
+    return result
+
+
 def parse_file(path):
     """Extract session summary, GPS trace, best splits and decoupling."""
     d = {"file": os.path.basename(path)}
     pts, ts, ds, hrs, spds, alts = [], [], [], [], [], []
+    gps_records = []
     try:
         with fitdecode.FitReader(path, check_crc=fitdecode.CrcCheck.DISABLED) as fr:
             for frame in fr:
@@ -93,12 +203,15 @@ def parse_file(path):
                         t = frame.get_value("timestamp", fallback=None)
                         dist = frame.get_value("distance", fallback=None)
                         hr = frame.get_value("heart_rate", fallback=None)
-                        spd = (frame.get_value("enhanced_speed", fallback=None)
-                               or frame.get_value("speed", fallback=None))
+                        spd = frame.get_value("enhanced_speed", fallback=None)
+                        if spd is None:
+                            spd = frame.get_value("speed", fallback=None)
                     except Exception:
                         continue
                     if lat is not None and lon is not None:
                         pts.append((lat * SEMI, lon * SEMI))
+                        if t is not None:
+                            gps_records.append((lat * SEMI, lon * SEMI, t.timestamp(), spd))
                     if t is not None and dist is not None:
                         try:
                             alt = (frame.get_value("enhanced_altitude", fallback=None)
@@ -116,9 +229,9 @@ def parse_file(path):
                             d[f.name] = str(f.value) if isinstance(f.value, datetime.datetime) else f.value
     except Exception as e:
         d["error"] = str(e)
+    d["breakpoints"] = detect_breakpoints(gps_records)
     if pts:
-        step = max(1, len(pts) // 400)  # coarse pre-downsample; RDP refines later
-        d["pts"] = pts[::step]
+        d["pts"] = pts  # preserve corners; simplify only after cluster projection
     if ts:
         d["best"] = best_windows(ts, ds)
         if d.get("total_timer_time", 0) >= 2400:  # decoupling only means something ≥40 min
@@ -168,26 +281,10 @@ def build_routes(ws):
         pts = w.get("pts")
         if not pts or len(pts) < 4:
             continue
-        # project to a locally-flat plane: x = lon*cos(lat), y = lat
-        clat = math.cos(math.radians(pts[0][0]))
-        flat = [(p[1] * clat, p[0]) for p in pts]
-        # snap to a ~28 m grid: GPS jitter between days draws the same street
-        # as parallel lines; snapping makes repeated passes geometrically
-        # identical, so overlapping strokes actually stack their ink
-        g = 0.00025
-        snapped = [(round(x / g) * g, round(y / g) * g) for x, y in flat]
-        flat = [p for i, p in enumerate(snapped) if i == 0 or p != snapped[i - 1]]
-        if len(flat) < 3:
-            continue
-        # tolerance just under grid/2: removes snap staircase corners while
-        # keeping identical snapped inputs -> identical simplified outputs
-        flat = rdp(flat, 0.00012)
-        # cluster key = start point: a long run belongs to the territory it
-        # starts from, not to the centroid it drifts toward
-        cx, cy = flat[0]
-        traces.append({"xy": flat, "sport": w.get("sport", "other"),
+        traces.append({"pts": pts, "sport": w.get("sport", "other"),
                        "km": w.get("total_distance", 0) / 1000,
-                       "cx": cx, "cy": cy, "clat": clat,
+                       "cx": pts[0][1], "cy": pts[0][0],
+                       "breakpoints": w.get("breakpoints", []),
                        "lat0": pts[0][0], "lon0": pts[0][1]})
     if not traces:
         return {"clusters": [], "other": {"n": 0, "km": 0}}
@@ -197,7 +294,7 @@ def build_routes(ws):
     for t in traces:
         best = None
         for c in clusters:
-            dd = math.hypot(c["cx"] - t["cx"], c["cy"] - t["cy"])
+            dd = math.hypot((c["cx"] - t["cx"])*math.cos(math.radians((c["cy"]+t["cy"])/2)), c["cy"] - t["cy"])
             if dd < 0.035 and (best is None or dd < best[0]):
                 best = (dd, c)
         if best:
@@ -219,6 +316,15 @@ def build_routes(ws):
 
     out = []
     for c in shown:
+        clat = math.cos(math.radians(c["cy"]))
+        for t in c["tr"]:
+            g = 0.00005  # ~5.5m in the local projected plane
+            snapped = [(round(lon*clat/g)*g, round(lat/g)*g) for lat, lon in t["pts"]]
+            flat = [p for i,p in enumerate(snapped) if i == 0 or p != snapped[i-1]]
+            t["xy"] = rdp(flat, 0.00002)
+        c["tr"] = [t for t in c["tr"] if len(t.get("xy", [])) >= 2]
+        if not c["tr"]:
+            continue
         xs = [x for t in c["tr"] for x, _ in t["xy"]]
         ys = [y for t in c["tr"] for _, y in t["xy"]]
         # percentile bbox: one stray point-to-point route must not blow up
@@ -233,8 +339,12 @@ def build_routes(ws):
         s = min(sx, sy)
         ox = (W - (x1 - x0) * s) / 2
         oy = (H - (y1 - y0) * s) / 2
-        paths = []
+        paths, breakpoints = [], []
         for t in c["tr"]:
+            for stop in t["breakpoints"]:
+                breakpoints.append({"x":round(ox+(stop["lon"]*clat-x0)*s,1),
+                                    "y":round(oy+(y1-stop["lat"])*s,1),
+                                    "duration_s":stop["duration_s"]})
             coords = [(ox + (x - x0) * s, oy + (y1 - y) * s) for x, y in t["xy"]]
             dstr = "M" + "L".join(f"{x:.0f} {y:.0f}" for x, y in coords)
             paths.append({"d": dstr, "s": t["sport"]})
@@ -244,10 +354,12 @@ def build_routes(ws):
         label = f"{abs(lat):.2f}°{'N' if lat >= 0 else 'S'} {abs(lon):.2f}°{'E' if lon >= 0 else 'W'}"
         out.append({"label": label, "n": len(c["tr"]),
                     "km": round(sum(t["km"] for t in c["tr"]), 1),
-                    "w": round(W), "h": round(H), "paths": paths})
+                    "w": round(W), "h": round(H), "paths": paths, "breakpoints": breakpoints})
     other = {"n": sum(len(c["tr"]) for c in rest),
              "km": round(sum(t["km"] for c in rest for t in c["tr"]), 1)}
-    return {"clusters": out, "other": other}
+    return {"clusters": out, "other": other,
+            "breakpoint_count": sum(len(w.get("breakpoints", [])) for w in ws),
+            "breakpoint_method": "Likely stops / break points: speed <0.5 m/s for >120s; GPS gaps >30s excluded"}
 
 
 def dt(w):
@@ -263,6 +375,8 @@ def sport_category(w):
     """Exclusive display groups; retain original FIT sport labels separately."""
     sport = str(w.get("sport") or "unknown")
     sub = str(w.get("sub_sport") or "")
+    if sub in ("strength_training", "strength"):
+        return "strength"
     mind = {"fitness_equipment", "yoga", "flexibility", "flexibility_training",
             "pilates", "mind_and_body"}
     if sport in mind or sub in mind:
@@ -466,6 +580,8 @@ def aggregate(parsed):
         "generated": datetime.date.today().isoformat(),
         "meta": {"files": len(parsed), "unique": len(ws)},
         "sports": sports,
+        "muscle_load": muscle_summary(ws, load_routine_rules()),
+        "routine_method": "Muscle exposure inferred by matching workout timestamps/dates against routines.md; historical sessions use the approved routine union. Programmatic estimate, not biometric measurement.",
         "hiking": sport_summary(hikes, sessions=True),
         "swim": sport_summary(swims, sessions=True),
         "totals": {

@@ -16,7 +16,7 @@ class SiteTests(unittest.TestCase):
         assert match is not None
         data = json.loads(match.group(1))
         self.assertEqual(data, json.loads((HERE / 'data.json').read_text()))
-        for section in ('sports', 'data', 'projects', 'code', 'directory'):
+        for section in ('athlete', 'builder', 'data', 'identity'):
             self.assertIn(f'<section id="{section}">', html)
         for chart in ('monChart','wkChart','effChart','runScatter','loadChart','decChart','routeMaps','elevProfiles'):
             self.assertIn(f'id="{chart}"', html)

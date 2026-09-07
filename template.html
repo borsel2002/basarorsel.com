@@ -159,8 +159,8 @@ tr:last-child td{border-bottom:none}
 
 
 /* Portfolio additions; sibling base above is unchanged. */
-html[data-section="sports"],html[data-section="data"]{--accent:var(--sports-accent)}
-html[data-section="projects"]{--accent:var(--math-accent)}
+html[data-section="athlete"],html[data-section="data"]{--accent:var(--sports-accent)}
+html[data-section="builder"]{--accent:var(--math-accent)}
 html[data-section="code"]{--accent:var(--code-accent)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hero-actions{display:flex;flex-wrap:wrap;gap:24px;margin-top:28px;font-size:13px}
@@ -188,6 +188,27 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
 .skip-link:focus{top:8px}
 @media(max-width:720px){.panel{padding:18px 14px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .v{font-size:21px}.kpis .s{padding:14px}#monChart,#runScatter{min-width:660px}.chart-scroll{overflow-x:auto}.brand span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body,.card{transition:none}}
+/* Shared identity layout: keep identical on .com and .me. */
+header.hero{min-height:100vh;display:flex;align-items:flex-start;padding:140px 0 80px;text-align:center}
+header.hero>.wrap{width:100%}
+.signature-name{display:block;width:min(760px,100%);height:auto;margin:0 auto 18px;color:var(--fg);filter:none}
+:root[data-theme="dark"] .signature-name{filter:invert(1)}
+.hero .role,.hero .lead,.hero p,.hero .statstrip{margin-left:auto;margin-right:auto}
+.hero-actions{justify-content:center}
+section>.wrap{text-align:center}
+section .lead{margin-left:auto;margin-right:auto}
+.card{text-align:center}
+.nowgrid,.table-scroll,.methods{text-align:left}
+@media(max-width:600px){header.hero{padding:110px 0 56px}}
+
+.data-tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:32px 0}
+.data-tabs button,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);padding:10px 16px;cursor:pointer}
+.data-tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+[hidden]{display:none!important}.category-title{margin:42px 0 20px}
+.muscle-map{width:100%;max-width:640px;height:auto;display:block;margin:24px auto}
+.muscle-map text{fill:var(--fg);font:28px ui-monospace,monospace}.muscle-map .muscle{fill:var(--accent);stroke:var(--fg);stroke-width:1}
+.muscle-counts{display:flex;justify-content:center;gap:8px 18px;flex-wrap:wrap;font:12px ui-monospace,monospace}
+#routeMaps .break-point{fill:var(--bg);stroke:var(--fg);stroke-width:2}
 </style>
 <noscript><style>section{display:block !important}.menu-btn,#themeBtn{display:none}.links{display:flex;position:static}.hero{min-height:auto}</style></noscript>
 </head><body>
@@ -203,12 +224,10 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="links" id="links">
-      <a href="#sports">Sports</a>
+      <a href="#athlete">Athlete</a>
+      <a href="#builder">Builder</a>
       <a href="#data">Data</a>
-      <a href="#projects">Projects</a>
-      <a href="#code">Code</a>
-      <a href="#directory">Directory</a>
-      <a href="https://basarorsel.me">Identity ↗</a>
+      <a href="#identity">Identity</a>
       <button id="themeBtn" title="Theme: auto follows the sun — white is the day, black is the night">AUTO</button>
     </div>
   </div>
@@ -221,18 +240,18 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
     <div class="role">portfolio · training data · projects · code</div>
     <p class="lead" style="margin-top:28px">The training I logged.<br>The things I built.<br>The source behind both.</p>
     <p style="margin-top:22px">The person is at <a href="https://basarorsel.me">basarorsel.me</a>. This is the working record: measured sessions, public projects, and code you can inspect.</p>
-    <div class="hero-actions mono"><a href="#data">Open training data →</a><a href="#projects">See projects →</a></div>
+    <div class="hero-actions mono"><a href="#data">Open training data →</a><a href="#builder">See projects →</a></div>
     <div class="statstrip" id="heroStats"></div>
     <div class="qed" id="fresh"></div>
   </div>
 </header>
-<section id="sports">
+<section id="athlete">
   <div class="wrap">
-    <span class="label">01 — Sports</span>
+    <span class="label">01 — Athlete</span>
     <h2>Returning to competition.</h2>
     <div class="cols">
-      <div><p>Former national sprint orienteer for Turkey. Rebuilding toward the senior-elite men's team, E21E, in 2027.</p><p>Current state: detrained. Previous selection is history, not evidence of current fitness. The work now is restoring running capacity and bringing it back to the map.</p></div>
-      <div><p>The running gate is 3000 m under 10:00. It is a target, not an achieved result or a guarantee of selection.</p><p>The log below shows what the watch recorded. It cannot tell you how cleanly I navigated or whether I am ready to race.</p><p class="sig">sprint orienteering · running · strength</p></div>
+      <div><p>Former national orienteer for Turkey. Rebuilding toward the senior-elite men's team, E21E, in 2027.</p><p>Current state: detrained. Previous selection is history, not evidence of current fitness. The work now is restoring running capacity and bringing it back to the map.</p></div>
+      <div><p>The running gate is 3000 m under 10:00. It is a target, not an achieved result or a guarantee of selection.</p><p>The log below shows what the watch recorded. It cannot tell you how cleanly I navigated or whether I am ready to race.</p><p>Mountaineering adds time on feet and ascent. Triathlon-oriented training currently means swim + run: no cycling data exists in this export. Strength and mobility are load-bearing structures supporting the endurance work, not afterthoughts.</p><p class="sig">orienteering · mountaineering · swim + run · strength · mobility</p></div>
     </div>
     <div style="margin-top:38px">
       <div class="goal"><span class="g">E21E · 2027</span><span class="st">selection target · not achieved</span></div>
@@ -241,16 +260,6 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
       <div class="goal"><span class="g" id="longest">—</span><span class="st">longest recorded run</span></div>
     </div>
     <p class="goalnote">Historical bests do not describe today's fitness. <span id="sportsDate"></span></p>
-    <div class="panel" id="hikingPanel">
-      <h4>Mountaineering / hiking</h4>
-      <p class="sub">FIT hiking sessions. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
-      __HIKING__
-    </div>
-    <div class="panel" id="swimPanel">
-      <h4>Triathlon / swim + run</h4>
-      <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
-      __SWIM__
-    </div>
     <div class="panel" id="sportsTable">
       <h4>Full training mix / every discipline</h4>
       <p class="sub">Deduplicated sessions, grouped by FIT sport and display category. Unrecognized sports stay visible. Sub-sports retain the export's labels.</p>
@@ -266,6 +275,14 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
     <h2>The training log.</h2>
     <p class="lead">Volume, pace, heart rate and the gaps between recorded sessions. This is a dated snapshot of watch data, not a live feed.</p>
 
+    <div class="data-tabs" role="tablist" aria-label="Training discipline">
+      <button id="tab-running" role="tab" aria-controls="data-running" aria-selected="true" data-tab="running">Running</button>
+      <button id="tab-mountaineering" role="tab" aria-controls="data-mountaineering" aria-selected="false" tabindex="-1" data-tab="mountaineering">Mountaineering</button>
+      <button id="tab-triathlon" role="tab" aria-controls="data-triathlon" aria-selected="false" tabindex="-1" data-tab="triathlon">Triathlon</button>
+      <button id="tab-strength" role="tab" aria-controls="data-strength" aria-selected="false" tabindex="-1" data-tab="strength">Strength</button>
+      <button id="tab-mobility" role="tab" aria-controls="data-mobility" aria-selected="false" tabindex="-1" data-tab="mobility">Mobility</button>
+    </div>
+    <div id="data-running" role="tabpanel" aria-labelledby="tab-running">
     <div class="qed" id="gateHint"></div>
     <div class="method-note"><b>Read the limits.</b> Rolling splits are GPS-derived, not certified race results. Heart-rate load is a model, not a fitness test. Missing logs are not proof of inactivity. <a href="#methodology" id="methodLink">Methods &amp; source ↓</a></div>
     <div id="gate" hidden>
@@ -317,6 +334,7 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
       <div class="panel" id="routesPanel">
         <h4>The territory</h4>
         <div class="sub" id="routesSub"></div>
+        <p class="sub">Outlined break-point markers indicate likely stops / break points: speed below 0.5 m/s for more than 120 seconds. GPS gaps over 30 seconds are excluded; slow movement and GPS error can still look like stops.</p>
         <div id="routeMaps"></div>
       </div>
 
@@ -336,6 +354,39 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
       </div>
     </div>
 
+    </div>
+    <div id="data-mountaineering" role="tabpanel" aria-labelledby="tab-mountaineering" hidden>    <div class="panel" id="hikingPanel">
+      <h4>Mountaineering / hiking</h4>
+      <p class="sub">FIT hiking sessions. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
+      __HIKING__
+    </div>
+    </div>
+    <div id="data-triathlon" role="tabpanel" aria-labelledby="tab-triathlon" hidden>
+    <p class="method-note">No cycling data exists in this export. Swim + run records do not establish a completed triathlon or a bike split.</p>
+    <div class="panel" id="swimPanel">
+      <h4>Triathlon / swim + run</h4>
+      <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
+      __SWIM__
+    </div>
+    </div>
+    <div id="data-strength" role="tabpanel" aria-labelledby="tab-strength" hidden>
+      <div class="panel"><h3>Strength / muscle heatmap</h3>
+      <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
+      <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
+      <label>Window <select id="window-strength" aria-label="Strength heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
+      <p id="summary-strength" class="sub"></p><svg id="muscles-strength" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Strength inferred muscle heatmap"></svg>
+      <p class="sub">Schematic muscle-group map, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
+      <div id="counts-strength" class="muscle-counts"></div></div>
+    </div>
+    <div id="data-mobility" role="tabpanel" aria-labelledby="tab-mobility" hidden>
+      <div class="panel"><h3>Mobility / muscle heatmap</h3>
+      <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
+      <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
+      <label>Window <select id="window-mobility" aria-label="Mobility heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
+      <p id="summary-mobility" class="sub"></p><svg id="muscles-mobility" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Mobility inferred muscle heatmap"></svg>
+      <p class="sub">Schematic muscle-group map, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
+      <div id="counts-mobility" class="muscle-counts"></div></div>
+    </div>
     <details id="methodology" class="panel methods">
       <summary>Methods, limitations &amp; source</summary>
       <div id="provenance" class="sub"></div>
@@ -343,47 +394,47 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
       <p>Best splits use a rolling distance window with interpolation through record frames. They are not race results. Route drawings use simplified, projected GPS traces; they omit a basemap and are not for navigation. Only location clusters are drawn; other traces are counted separately.</p>
       <p>Banister TRIMP uses average heart rate, the highest recorded HR and an explicitly assumed resting HR. The load curves are exponentially weighted averages, initialized at zero. They are not measured fitness or a prescription. The form value is chronic minus acute load.</p>
       <p>Decoupling compares speed/HR between halves, after excluding the warm-up and filtering movement records. Quarterly averages combine different routes, conditions and intensities; pace and HR have separate scales. Elevation is watch-derived and can contain altitude error. Calories are watch estimates.</p>
-      <p>Targets in Sports are goals, not telemetry. The current-state description is self-reported. This snapshot does not establish readiness for selection.</p>
+      <p>Targets in Athlete are goals, not telemetry. The current-state description is self-reported. This snapshot does not establish readiness for selection.</p>
       <p><a href="https://github.com/borsel2002/basarorsel.com/blob/main/fit_pipeline.py">Read the parser &amp; calculations ↗</a> · <a href="data.json" download>Download this aggregate ↓</a></p>
     </details>
   </div>
 </section>
 
-<section id="projects">
+<section id="builder">
   <div class="wrap">
-    <span class="label">03 — Projects</span>
-    <h2>Built. Inspectable.</h2>
-    <p class="lead section-lead">Small enough to understand end to end. These are the finished artifacts, not a list of things I plan to build.</p>
+    <span class="label">02 — Builder</span>
+    <h2>Small systems. Open source.</h2>
+    <p class="lead section-lead">Shipped sites, hardware studies and public experiments. A repository is evidence of code, not a verified deployment or a claim of sole authorship.</p>
+    <h3 class="category-title">Production</h3>
     <div class="cards">
-      <article class="card"><div class="n">Data / this site</div><h3>FIT training ledger</h3><p>Watch exports become one embedded dataset. Python parses and aggregates; browser-native SVG draws volume, effort, load and routes. No chart library. No account.</p><div class="sig"><a href="#data">Open dashboard →</a> · <a href="https://github.com/borsel2002/basarorsel.com">Source ↗</a></div></article>
-      <article class="card"><div class="n">Web / identity</div><h3>basarorsel.me</h3><p>A hand-coded identity page. One document, hash navigation, and a theme that follows the local hour. The same visual system as this portfolio.</p><div class="sig"><a href="https://basarorsel.me">Visit site ↗</a> · <a href="https://github.com/borsel2002/basarorsel.me">Source ↗</a></div></article>
+      <article class="card"><div class="n">HTML + Python / live site</div><h3>basarorsel.com</h3><p>HealthFit exports become an embedded training ledger. Python aggregates the record; dependency-free SVG draws volume, routes and inferred routine exposure.</p><div class="sig"><a href="#data">Explore the data →</a> · <a href="https://github.com/borsel2002/basarorsel.com">Source ↗</a></div></article>
+      <article class="card"><div class="n">HTML / live site</div><h3>basarorsel.me</h3><p>The identity page. One hand-coded document, hash navigation, a local-hour theme and the same signature and visual rhythm as this portfolio.</p><div class="sig"><a href="https://basarorsel.me">Visit ↗</a> · <a href="https://github.com/borsel2002/basarorsel.me">Source ↗</a></div></article>
     </div>
-    <div class="nowgrid">
-      <div class="k">Runtime</div><div class="v">HTML, CSS, JavaScript and SVG. No framework, CDN, tracker or runtime dependency.</div>
-      <div class="k">Data path</div><div class="v">HealthFit export → FIT records → deduplicated sessions → aggregate JSON → charts.</div>
-      <div class="k">Boundary</div><div class="v">The raw watch files stay local. The published aggregate includes dates, heart-rate summaries and route shapes.</div>
+    <h3 class="category-title">Hardware / Systems</h3>
+    <div class="cards">
+      <article class="card"><div class="n">RFID / prototype archive</div><h3>Innovation-Registery</h3><p>An event and society registration experiment with an RFID reader script. Related RHT_RFID code includes Arduino and Python server components. These are prototypes, not verified production attendance systems.</p><div class="sig"><a href="https://github.com/borsel2002/Innovation-Registery">Registry source ↗</a> · <a href="https://github.com/borsel2002/RHT_RFID">RHT_RFID ↗</a></div></article>
+      <article class="card"><div class="n">Raspberry Pi / systems study</div><h3>Small-server experiments</h3><p>The raspberry-pi-web-server repository records a Pi hosting experiment. RFID and object detection also appear in the InoReg fork below; that implementation has upstream authors and is not presented as my original work.</p><div class="sig"><a href="https://github.com/borsel2002/raspberry-pi-web-server">Repository ↗</a></div></article>
     </div>
+    <h3 class="category-title">Experiments / Archives</h3>
+    <div class="cards">
+      <article class="card"><div class="n">Python / unvalidated experiment</div><h3>carbon-footprint</h3><p>A receipt-analysis and carbon-estimation experiment with Python, a web interface and tests. Its estimates, accuracy and compliance claims have not been independently validated; this is not a certified environmental accounting tool.</p><div class="sig"><a href="https://github.com/borsel2002/carbon-footprint">Inspect the experiment ↗</a></div></article>
+      <article class="card"><div class="n">Mathematics / ongoing study</div><h3>Questions before claims</h3><p>Topology, knot theory, machine learning and LLMs are study interests. No standalone mathematics simulation was verified in the public repository inventory, so none is presented here as a finished project.</p><div class="sig"><a href="https://github.com/borsel2002?tab=repositories">Public repository inventory ↗</a></div></article>
+    </div>
+    <h3 class="category-title">Forks / Studying</h3>
+    <div class="cards">
+      <article class="card"><div class="n">Fork / upstream credit</div><h3>InoReg</h3><p>A fork of NOMANSAEEDSOOMRO/Attendance-System: RFID and object detection using Raspberry Pi. Listed as a study reference, not an original implementation or a verified deployment by me.</p><div class="sig"><a href="https://github.com/borsel2002/InoReg">Fork ↗</a> · <a href="https://github.com/NOMANSAEEDSOOMRO/Attendance-System">Upstream ↗</a></div></article>
+      <article class="card"><div class="n">Forks / reading other people's code</div><h3>Agents &amp; embedded systems</h3><p>AutoGPT and esp-rfid are upstream projects represented by forks in my account. Their functionality and authorship belong to their maintainers; a fork is not a contribution claim.</p><div class="sig"><a href="https://github.com/borsel2002/AutoGPT">AutoGPT fork ↗</a> · <a href="https://github.com/borsel2002/esp-rfid">esp-rfid fork ↗</a></div></article>
+    </div>
+    <div class="panel methods"><h3>How this site is built</h3><p>HealthFit → FIT → Python → JSON → SVG / self-contained HTML.</p><p>Raw FIT files stay local. The aggregate contains training summaries and simplified route shapes. No framework, CDN, tracker, account or runtime network request is required.</p></div>
   </div>
 </section>
-<section id="code">
+<section id="identity">
   <div class="wrap">
-    <span class="label">04 — Code</span>
-    <h2>Read the implementation.</h2>
-    <p class="lead section-lead">Source for the finished sites. Older public repositories are separate; a repository existing is not a claim that it is production-ready.</p>
-    <div class="cards">
-      <a class="card" href="https://github.com/borsel2002/basarorsel.com"><div class="n">Finished artifact / HTML + Python</div><h3>basarorsel.com ↗</h3><p>This portfolio, the telemetry calculations, its data snapshot and tests. The page can run directly from a file.</p><div class="sig">read the source →</div></a>
-      <a class="card" href="https://github.com/borsel2002/basarorsel.me"><div class="n">Finished artifact / HTML</div><h3>basarorsel.me ↗</h3><p>The identity site and the original sun-following theme. No build toolchain or framework.</p><div class="sig">read the source →</div></a>
-    </div>
-    <div class="cols"><div><h3>Public experiments</h3><p><a href="https://github.com/borsel2002/aegean-lion">aegean-lion</a> contains a nutrition-protocol interface. <a href="https://github.com/borsel2002/InoReg">InoReg</a> describes an RFID and object-detection attendance system. These are code archives, not verified deployments.</p></div><div><h3>Still studying</h3><p>B.Sc. Mathematics at İYTE. Topology, knot theory, machine learning and LLMs are ongoing interests, not a list of shipped research projects.</p><p class="sig"><a href="https://github.com/borsel2002?tab=repositories">All public repositories ↗</a></p></div></div>
-  </div>
-</section>
-<section id="directory">
-  <div class="wrap">
-    <span class="label">05 — Directory</span>
+    <span class="label">04 — Identity</span>
     <h2>Three sites. Different jobs.</h2>
     <div class="cards cards-3">
       <a class="card" href="https://basarorsel.me"><div class="n">Identity</div><h3>basarorsel.me</h3><p>The person: mathematics, sport, current direction and contact.</p><div class="sig">meet the person →</div></a>
-      <a class="card" href="#projects"><div class="n">Portfolio / you are here</div><h3>basarorsel.com</h3><p>Training data, finished projects and public source code.</p><div class="sig">see the projects →</div></a>
+      <a class="card" href="#builder"><div class="n">Portfolio / you are here</div><h3>basarorsel.com</h3><p>Training data, finished projects and public source code.</p><div class="sig">see the projects →</div></a>
       <a class="card" href="https://orselstudio.tech"><div class="n">Work / Orsel Studio</div><h3>orselstudio.tech</h3><p>WooCommerce, AI/search optimization and complete websites. Business belongs there, not in the training log.</p><div class="sig">talk about work →</div></a>
     </div>
   </div>
@@ -406,9 +457,10 @@ btn.onclick = () => { mode = modes[(modes.indexOf(mode)+1)%3]; localStorage.setI
 apply(); setInterval(apply, 60000);
 
 /* ---------- page router: intro first, everything else via the menu ---------- */
-const SECTIONS = ['sports','data','projects','code','directory'];
+const SECTIONS = ['athlete','builder','data','identity'];
 function route(){
-  const h = location.hash.replace('#','');
+  const raw = location.hash.replace('#','');
+  const h = ({sports:'athlete',projects:'builder',code:'builder',directory:'identity'})[raw] || raw;
   const valid = SECTIONS.includes(h);
   const section = valid ? h : 'home';
   document.documentElement.dataset.section = section;
@@ -627,6 +679,7 @@ function routes(){
     <figure class="map${i===0?' primary':''}">
       <svg viewBox="0 0 ${c.w} ${c.h}" preserveAspectRatio="xMidYMid meet">
         ${c.paths.map(p=>`<path class="rt${p.s==='swimming'?' swim':''}" d="${p.d}"/>`).join('')}
+        ${(c.breakpoints||[]).map(b=>`<circle class="break-point" cx="${b.x}" cy="${b.y}" r="5"><title>Likely stop / break point · ${b.duration_s}s</title></circle>`).join('')}
       </svg>
       <figcaption class="cap"><span>${c.label}</span><span>${c.n} traces · ${c.km.toFixed(0)} km</span></figcaption>
     </figure>`).join('');
@@ -646,6 +699,43 @@ $('longest').textContent = `${P.longest_km} km · ${P.longest_date}`;
 $('sportsDate').textContent = `Data generated ${D.generated}.`;
 $('provenance').textContent = `${D.meta.files} input files → ${D.meta.unique} unique workouts · generated ${D.generated}`;
 $('methodLink').onclick = e => { e.preventDefault(); $('methodology').open=true; $('methodology').scrollIntoView({behavior:'smooth',block:'start'}); };
+/* ---------- accessible discipline tabs and routine exposure ---------- */
+const tabs = [...document.querySelectorAll('[data-tab]')];
+function selectDataTab(tab, focus=false){
+  tabs.forEach(b=>{const on=b===tab;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;$(b.getAttribute('aria-controls')).hidden=!on;});
+  if(focus) tab.focus();
+}
+tabs.forEach((b,i)=>{
+  b.addEventListener('click',()=>selectDataTab(b));
+  b.addEventListener('keydown',e=>{
+    let n=null;
+    if(e.key==='ArrowRight') n=(i+1)%tabs.length;
+    if(e.key==='ArrowLeft') n=(i+tabs.length-1)%tabs.length;
+    if(e.key==='Home') n=0;
+    if(e.key==='End') n=tabs.length-1;
+    if(n!==null){e.preventDefault();selectDataTab(tabs[n],true);}
+  });
+});
+function muscleMap(category){
+  const load=D.muscle_load[category], window=$('window-'+category).value, counts=load[window];
+  const svg=$('muscles-'+category);svg.replaceChildren();
+  const title=svgEl('title',{});title.textContent=category+' inferred muscle heatmap: attributed sessions';svg.append(title);
+  // A schematic map: every approved group remains distinct, no anatomy claims.
+  const groups=Object.keys(counts), rows=Math.ceil(groups.length/2), rowH=66;
+  svg.setAttribute('viewBox',`0 0 640 ${rows*rowH+20}`);
+  const max=Math.max(1,...Object.values(counts));
+  groups.forEach((name,i)=>{
+    const x=10+(i%2)*320,y=10+Math.floor(i/2)*rowH;
+    const g=svgEl('g',{}), rect=svgEl('rect',{x,y,width:300,height:52,rx:8,class:'muscle','fill-opacity':counts[name] ? (0.12+0.68*counts[name]/max).toFixed(2):0});
+    const tt=svgEl('title',{});tt.textContent=`${name}: ${counts[name]} attributed sessions`;g.append(rect,tt);
+    const text=svgEl('text',{x:x+150,y:y+30,'text-anchor':'middle'});text.textContent=name.replaceAll('-',' ');g.append(text);svg.append(g);
+  });
+  $('summary-'+category).textContent=`${load.matched_sessions} attributed sessions (${load.historical_sessions} historical, ${load.logged_sessions} logged); ${load.unmatched_sessions} unmatched. Recent window: ${D.muscle_load.recent_from}–${D.muscle_load.as_of}, relative to the latest workout, not today.`;
+  const target=$('counts-'+category);target.replaceChildren();
+  Object.entries(counts).forEach(([name,n])=>{const span=document.createElement('span');span.textContent=`${name}: ${n}`;target.append(span);});
+}
+['strength','mobility'].forEach(c=>{$('window-'+c).addEventListener('change',()=>muscleMap(c));muscleMap(c);});
+
 drawAll();
 // SVG titles support screen readers; native point titles retain raw values.
 for (const svg of document.querySelectorAll('#dash svg')) {
