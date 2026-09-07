@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Başar Örsel — training data, projects &amp; code</title>
+<meta name="description" content="The working record of Başar Örsel: training telemetry from FIT files, finished projects and public source code. A hand-coded portfolio.">
+<link rel="canonical" href="https://basarorsel.com/">
+<meta property="og:title" content="Başar Örsel — portfolio">
+<meta property="og:description" content="Training data, finished projects and the source behind both.">
+<meta property="og:url" content="https://basarorsel.com/">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<style>
+/* ---------- base: white is the day, black is the night ---------- */
+:root{
+  --bg:#fff;--fg:#0b0b0b;--mut:#656565;--line:#e8e8e8;--card:#fafafa;
+  --main-accent:#6b6b6b;--sports-accent:#008c7a;--math-accent:#6048b5;--code-accent:#2f6f5e;--work-accent:#334155;
+  --accent:var(--main-accent);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#050505;--fg:#f5f5f5;--mut:#a0a0a0;--line:#202020;--card:#0d0d0d;
+  --main-accent:#c7c7c7;--sports-accent:#17c8af;--math-accent:#a894ff;--code-accent:#7ed7b6;--work-accent:#9db4d2;
+  color-scheme:dark;
+}
+html[data-section="home"], html[data-section="principles"], html[data-section="contact"], html[data-section="now"]{--accent:var(--main-accent)}
+html[data-section="academic"]{--accent:var(--math-accent)}
+html[data-section="hobbies"]{--accent:var(--main-accent)}
+html[data-section="directory"]{--accent:var(--work-accent)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;transition:background .45s,color .45s}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:inherit;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent),transparent 45%)}
+a:hover{color:var(--accent)}
+.mono,.label,.sig,.role,.statstrip,.goal,.qed,footer{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;background:color-mix(in srgb,var(--bg),transparent 12%);backdrop-filter:blur(18px);z-index:50;border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px}
+.brand{font-size:12px;letter-spacing:.16em;border:0;color:var(--fg);display:flex;align-items:center;gap:10px}
+.brand-logo{width:34px;height:34px;display:block;object-fit:contain;border-radius:50%}
+.brand-logo-dark{display:none}
+:root[data-theme="dark"] .brand-logo-light{display:none}
+:root[data-theme="dark"] .brand-logo-dark{display:block}
+.brand span{white-space:nowrap}
+.signature-name{display:block;width:min(760px,100%);height:auto;margin:0 0 18px;color:var(--fg);filter:none}
+:root[data-theme="dark"] .signature-name{filter:invert(1)}
+.links{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.links a,.links button{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);border:0;background:transparent;cursor:pointer;font:inherit;font-family:ui-monospace,Menlo,monospace}
+.links a.on,.links a:hover,.links button:hover{color:var(--accent)}
+
+/* ---------- sections ---------- */
+header.hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px}
+h1{font-size:clamp(58px,10vw,132px);line-height:.9;letter-spacing:-.075em;font-weight:800;max-width:900px}
+h2{font-size:clamp(34px,5vw,72px);line-height:.95;letter-spacing:-.055em;font-weight:760;max-width:900px;margin-top:18px}
+h3{font-size:18px;letter-spacing:-.015em;margin-bottom:8px}
+p{font-size:clamp(16px,1.7vw,20px);color:var(--mut);max-width:720px}
+.lead{font-size:clamp(20px,2.3vw,30px);line-height:1.25;letter-spacing:-.025em;color:var(--fg);max-width:820px}
+.role{margin-top:22px;color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.sig{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-top:18px}
+section{display:none;min-height:100vh;padding:130px 0 90px;border-top:1px solid var(--line)}
+section.active{display:block}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:42px;margin-top:42px}
+.cols p+p{margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:36px}
+.cards-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--line);background:var(--card);padding:22px;min-height:160px;transition:border-color .25s,transform .25s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card .n{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.16em;color:var(--accent);margin-bottom:22px;text-transform:uppercase}
+.statstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:54px;border:1px solid var(--line)}
+.s{background:var(--bg);padding:22px 18px}.s .v{font-size:24px;color:var(--fg);letter-spacing:-.03em}.s .k{margin-top:6px;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em}
+.goal{display:flex;justify-content:space-between;gap:24px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}.g{font-size:clamp(20px,2.5vw,34px);letter-spacing:-.04em}.st{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.1em;text-align:right}.goalnote{margin-top:22px;font-size:15px}.qed{margin-top:34px;color:var(--accent);font-size:13px;letter-spacing:.08em}
+.nowgrid{display:grid;grid-template-columns:170px 1fr;gap:0;margin-top:38px;border-top:1px solid var(--line)}
+.nowgrid div{border-bottom:1px solid var(--line);padding:16px 0}.nowgrid .k{font-family:ui-monospace,Menlo,monospace;color:var(--accent);font-size:12px;letter-spacing:.12em;text-transform:uppercase}.nowgrid .v{color:var(--fg);font-size:clamp(17px,1.7vw,22px)}
+
+/* ---------- hamburger ---------- */
+.menu-btn{display:none;background:transparent;border:0;cursor:pointer;padding:6px;color:var(--fg)}
+.menu-btn svg{display:block}
+
+/* ---------- responsive ---------- */
+@media(max-width:900px){
+  .cards-3{grid-template-columns:1fr 1fr}
+  .cards-3 .card:last-child{grid-column:1 / -1}
+}
+@media(max-width:820px){
+  .cols,.cards,.statstrip{grid-template-columns:1fr}
+  .cards-3{grid-template-columns:1fr}
+  .cards-3 .card:last-child{grid-column:auto}
+  .nowgrid{grid-template-columns:1fr}
+  .nowgrid .k{padding-bottom:0;border-bottom:0}
+  .statstrip{grid-template-columns:1fr 1fr}
+  nav .wrap{height:auto;min-height:64px;padding-top:14px;padding-bottom:14px}
+  .links{justify-content:flex-start}
+}
+@media(max-width:720px){
+  .menu-btn{display:block}
+  .links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:0;padding:8px 24px 16px}
+  .links.open{display:flex}
+  .links a,.links button{display:block;padding:12px 0;font-size:13px;border-bottom:1px solid var(--line);text-align:left}
+  .links a:last-child,.links button:last-child{border-bottom:0}
+  nav .wrap{gap:10px}
+  header.hero{padding:110px 0 56px}
+  h1{font-size:clamp(44px,14vw,72px)}
+  h2{font-size:clamp(28px,8vw,44px)}
+  .lead{font-size:clamp(18px,4.5vw,22px)}
+  .statstrip{grid-template-columns:1fr 1fr}
+  .goal{flex-direction:column;gap:6px;align-items:flex-start}
+  .goal .st{text-align:left}
+  section{padding:110px 0 70px}
+}
+footer{border-top:1px solid var(--line);padding:44px 0;font-size:11.5px;color:var(--mut);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+/* Dashboard styles from the FIT reference. */
+
+#dash{display:none}
+#dash.open{display:block}
+.panel{background:var(--card);border:1px solid var(--line);padding:26px;margin-bottom:22px;border-radius:2px}
+.panel h4{font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.panel .sub{font-size:12px;color:var(--mut);margin-bottom:18px;font-family:ui-monospace,Menlo,monospace}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+svg text{font-family:ui-monospace,Menlo,monospace;font-size:10px;fill:var(--mut)}
+svg .bar{fill:var(--accent)}
+svg .axis{stroke:var(--line)}
+svg .dot{fill:var(--accent);opacity:.75}
+svg .ln{stroke:var(--accent);fill:none;stroke-width:1.5}
+svg .ln2{stroke:var(--mut);fill:none;stroke-width:1.2;stroke-dasharray:4 3}
+table{width:100%;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+.hl td{font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:22px}
+.kpis .s{background:var(--card);padding:18px}
+.kpis .v{font-family:ui-monospace,Menlo,monospace;font-size:24px;font-weight:600}
+.kpis .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-top:4px}
+.truth{border-left:2px solid var(--accent);padding:4px 0 4px 18px;margin-top:8px;font-size:14px;color:var(--mut)}
+.truth b{color:var(--fg)}
+
+/* ---------- route maps: every GPS trace, ink on paper ---------- */
+#routeMaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+#routeMaps .map{border:1px solid var(--line);background:var(--bg);border-radius:2px;overflow:hidden}
+#routeMaps .map.primary{grid-column:1 / -1}
+#routeMaps svg{display:block;width:100%;height:auto}
+#routeMaps .rt{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.30}
+#routeMaps .rt.swim{stroke-dasharray:6 5}
+#routeMaps .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);padding:10px 14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+
+/* ---------- elevation profiles ---------- */
+#elevProfiles{margin-top:20px;display:grid;gap:14px}
+#elevProfiles .ep{border-top:1px solid var(--line);padding-top:10px}
+#elevProfiles .ep .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);display:flex;justify-content:space-between;margin-bottom:4px}
+#elevProfiles svg{display:block;width:100%;height:56px}
+#elevProfiles .fill{fill:var(--accent);opacity:.14;stroke:none}
+#elevProfiles .line{fill:none;stroke:var(--accent);stroke-width:1.4}
+
+
+/* Portfolio additions; sibling base above is unchanged. */
+html[data-section="sports"],html[data-section="data"]{--accent:var(--sports-accent)}
+html[data-section="projects"]{--accent:var(--math-accent)}
+html[data-section="code"]{--accent:var(--code-accent)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.hero-actions{display:flex;flex-wrap:wrap;gap:24px;margin-top:28px;font-size:13px}
+.section-lead{margin-top:28px}
+#data .lead{margin-top:28px}
+#data #dash{margin-top:30px}
+.method-note{font-size:14px;color:var(--mut);max-width:820px;margin:22px 0 28px}
+.method-note b{color:var(--fg)}
+#gate[hidden]{display:none}
+.grid2>*{min-width:0}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.panel{border-radius:0;min-width:0}
+.table-scroll{overflow-x:auto;max-width:100%}
+.table-scroll table{min-width:370px}
+#routeMaps{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+#routeMaps .cap,#elevProfiles .cap{flex-wrap:wrap}
+svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opacity:.65}
+#runScatter .dot{opacity:revert}
+.methods{margin-top:22px;scroll-margin-top:90px}
+.methods summary{font:13px ui-monospace,Menlo,monospace;cursor:pointer;color:var(--accent)}
+.methods p{font-size:15px;margin:14px 0}
+.methods .sub{margin-top:20px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+.skip-link{position:fixed;top:-100px;left:16px;z-index:100;background:var(--bg);padding:10px}
+.skip-link:focus{top:8px}
+@media(max-width:720px){.panel{padding:18px 14px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .v{font-size:21px}.kpis .s{padding:14px}#monChart,#runScatter{min-width:660px}.chart-scroll{overflow-x:auto}.brand span{font-size:11px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body,.card{transition:none}}
+</style>
+<noscript><style>section{display:block !important}.menu-btn,#themeBtn{display:none}.links{display:flex;position:static}.hero{min-height:auto}</style></noscript>
+</head><body>
+<a class="skip-link" href="#data">Skip to training data</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Başar Örsel home">
+      <img class="brand-logo brand-logo-light" src="brand-logo-light.svg" alt="" aria-hidden="true">
+      <img class="brand-logo brand-logo-dark" src="brand-logo-dark.svg" alt="" aria-hidden="true">
+      <span>BAŞAR&nbsp;ÖRSEL</span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="links" id="links">
+      <a href="#sports">Sports</a>
+      <a href="#data">Data</a>
+      <a href="#projects">Projects</a>
+      <a href="#code">Code</a>
+      <a href="#directory">Directory</a>
+      <a href="https://basarorsel.me">Identity ↗</a>
+      <button id="themeBtn" title="Theme: auto follows the sun — white is the day, black is the night">AUTO</button>
+    </div>
+  </div>
+</nav>
+<main>
+<header class="hero" id="home">
+  <div class="wrap">
+    <h1 class="sr-only">Başar Örsel — portfolio</h1>
+    <img class="signature-name" src="signature.svg" alt="Başar Örsel">
+    <div class="role">portfolio · training data · projects · code</div>
+    <p class="lead" style="margin-top:28px">The training I logged.<br>The things I built.<br>The source behind both.</p>
+    <p style="margin-top:22px">The person is at <a href="https://basarorsel.me">basarorsel.me</a>. This is the working record: measured sessions, public projects, and code you can inspect.</p>
+    <div class="hero-actions mono"><a href="#data">Open training data →</a><a href="#projects">See projects →</a></div>
+    <div class="statstrip" id="heroStats"></div>
+    <div class="qed" id="fresh"></div>
+  </div>
+</header>
+<section id="sports">
+  <div class="wrap">
+    <span class="label">01 — Sports</span>
+    <h2>A comeback, not a victory lap.</h2>
+    <div class="cols">
+      <div><p>Former national sprint orienteer for Turkey. Rebuilding toward the senior-elite men's team, E21E, in 2027.</p><p>Current state: detrained. Previous selection is history, not evidence of current fitness. The work now is restoring running capacity and bringing it back to the map.</p></div>
+      <div><p>The running gate is 3000 m under 10:00. It is a target, not an achieved result or a guarantee of selection.</p><p>The log below shows what the watch recorded. It cannot tell you how cleanly I navigated or whether I am ready to race.</p><p class="sig">sprint orienteering · running · strength</p></div>
+    </div>
+    <div style="margin-top:38px">
+      <div class="goal"><span class="g">E21E · 2027</span><span class="st">selection target · not achieved</span></div>
+      <div class="goal"><span class="g">3000 m &lt; 10:00</span><span class="st">running gate · not achieved</span></div>
+      <div class="goal"><span class="g" id="best5k">—</span><span class="st">fastest recorded rolling 5 km · historical</span></div>
+      <div class="goal"><span class="g" id="longest">—</span><span class="st">longest recorded run</span></div>
+    </div>
+    <p class="goalnote">Historical bests do not describe today's fitness. <span id="sportsDate"></span></p>
+    <div class="qed"><a href="#data">Read the full training log →</a></div>
+  </div>
+</section>
+<section id="data">
+  <div class="wrap">
+    <span class="label">02 — Training data</span>
+    <h2>The training log.</h2>
+    <p class="lead">Watch records, not a highlight reel. Volume, pace, heart rate and the gaps between sessions. This is a dated snapshot, not a live feed.</p>
+
+    <div class="qed" id="gateHint"></div>
+    <div class="method-note"><b>Read the limits.</b> Rolling splits are GPS-derived, not certified race results. Heart-rate load is a model, not a fitness test. Missing logs are not proof of inactivity. <a href="#methodology" id="methodLink">Methods &amp; source ↓</a></div>
+    <div id="gate" hidden>
+      <button id="openDash">▸ &nbsp;Open the dashboard</button>
+      
+    </div>
+
+    <div id="dash" class="open">
+      <div class="kpis" id="kpis"></div>
+
+      <div class="panel">
+        <h4>Monthly running volume</h4>
+        <div class="sub" id="monSub"></div>
+        <div class="chart-scroll" tabindex="0" role="region" aria-label="Scrollable chart"><svg id="monChart" width="100%" height="220" viewBox="0 0 980 220" preserveAspectRatio="none"></svg></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h4>Weekly volume</h4>
+          <div class="sub">km per ISO week, zero weeks included — gaps stay visible</div>
+          <svg id="wkChart" width="100%" height="190" viewBox="0 0 470 190" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="panel">
+          <h4>Aerobic efficiency</h4>
+          <div class="sub">quarterly means · pace (min/km, solid) / HR (bpm, dashed) · independent scales; not a controlled test</div>
+          <svg id="effChart" width="100%" height="190" viewBox="0 0 470 190" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h4>Recorded runs</h4>
+        <div class="sub">runs &gt;500 m and pace &lt;12 min/km · distance (x) / pace (y) · opacity = recency</div>
+        <div class="chart-scroll" tabindex="0" role="region" aria-label="Scrollable chart"><svg id="runScatter" width="100%" height="240" viewBox="0 0 980 240" preserveAspectRatio="none"></svg></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel" id="loadPanel">
+          <h4>Fitness · fatigue · form</h4>
+          <div class="sub" id="loadSub"></div>
+          <svg id="loadChart" width="100%" height="200" viewBox="0 0 470 200" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="panel" id="decPanel">
+          <h4>Aerobic decoupling</h4>
+          <div class="sub">speed/HR change between halves · qualifying runs ≥40 min · +5% reference, not a diagnosis</div>
+          <svg id="decChart" width="100%" height="200" viewBox="0 0 470 200" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+
+      <div class="panel" id="routesPanel">
+        <h4>The territory</h4>
+        <div class="sub" id="routesSub"></div>
+        <div id="routeMaps"></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h4>Long runs — half marathon and beyond</h4>
+          <div class="sub" id="hmSub"></div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Long runs table"><table id="hmTable"></table></div>
+          <div id="elevProfiles"></div>
+        </div>
+        <div class="panel">
+          <h4>Records &amp; structure</h4>
+          <div class="sub">fastest recorded rolling splits and support work · not race-certified</div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Records table"><table id="prTable"></table></div>
+          <div class="truth" id="truthNote"></div>
+        </div>
+      </div>
+    </div>
+
+    <details id="methodology" class="panel methods">
+      <summary>Methods, limitations &amp; source</summary>
+      <div id="provenance" class="sub"></div>
+      <p>Session summaries supply distance and timer time. Duplicate start-time/sport records are removed. Distance totals reconcile against monthly and weekly sums, within rounding tolerance. Weeks without a recorded run remain visible.</p>
+      <p>Best splits use a rolling distance window with interpolation through record frames. They are not race results. Route drawings use simplified, projected GPS traces; they omit a basemap and are not for navigation. Only location clusters are drawn; other traces are counted separately.</p>
+      <p>Banister TRIMP uses average heart rate, the highest recorded HR and an explicitly assumed resting HR. The load curves are exponentially weighted averages, initialized at zero. They are not measured fitness or a prescription. The form value is chronic minus acute load.</p>
+      <p>Decoupling compares speed/HR between halves, after excluding the warm-up and filtering movement records. Quarterly averages combine different routes, conditions and intensities; pace and HR have separate scales. Elevation is watch-derived and can contain altitude error. Calories are watch estimates.</p>
+      <p>Targets in Sports are goals, not telemetry. The current-state description is self-reported. This snapshot does not establish readiness for selection.</p>
+      <p><a href="https://github.com/borsel2002/basarorsel.com/blob/main/fit_pipeline.py">Read the parser &amp; calculations ↗</a> · <a href="data.json" download>Download this aggregate ↓</a></p>
+    </details>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <span class="label">03 — Projects</span>
+    <h2>Built. Inspectable.</h2>
+    <p class="lead section-lead">Small enough to understand end to end. These are the finished artifacts, not a list of things I plan to build.</p>
+    <div class="cards">
+      <article class="card"><div class="n">Data / this site</div><h3>FIT training ledger</h3><p>Watch exports become one embedded dataset. Python parses and aggregates; browser-native SVG draws volume, effort, load and routes. No chart library. No account.</p><div class="sig"><a href="#data">Open dashboard →</a> · <a href="https://github.com/borsel2002/basarorsel.com">Source ↗</a></div></article>
+      <article class="card"><div class="n">Web / identity</div><h3>basarorsel.me</h3><p>A hand-coded identity page. One document, hash navigation, and a theme that follows the local hour. The same visual system as this portfolio.</p><div class="sig"><a href="https://basarorsel.me">Visit site ↗</a> · <a href="https://github.com/borsel2002/basarorsel.me">Source ↗</a></div></article>
+    </div>
+    <div class="nowgrid">
+      <div class="k">Runtime</div><div class="v">HTML, CSS, JavaScript and SVG. No framework, CDN, tracker or runtime dependency.</div>
+      <div class="k">Data path</div><div class="v">HealthFit export → FIT records → deduplicated sessions → aggregate JSON → charts.</div>
+      <div class="k">Boundary</div><div class="v">The raw watch files stay local. The published aggregate includes dates, heart-rate summaries and route shapes.</div>
+    </div>
+  </div>
+</section>
+<section id="code">
+  <div class="wrap">
+    <span class="label">04 — Code</span>
+    <h2>Read the implementation.</h2>
+    <p class="lead section-lead">Source for the finished sites. Older public repositories are separate; a repository existing is not a claim that it is production-ready.</p>
+    <div class="cards">
+      <a class="card" href="https://github.com/borsel2002/basarorsel.com"><div class="n">Finished artifact / HTML + Python</div><h3>basarorsel.com ↗</h3><p>This portfolio, the telemetry calculations, its data snapshot and tests. The page can run directly from a file.</p><div class="sig">read the source →</div></a>
+      <a class="card" href="https://github.com/borsel2002/basarorsel.me"><div class="n">Finished artifact / HTML</div><h3>basarorsel.me ↗</h3><p>The identity site and the original sun-following theme. No build toolchain or framework.</p><div class="sig">read the source →</div></a>
+    </div>
+    <div class="cols"><div><h3>Public experiments</h3><p><a href="https://github.com/borsel2002/aegean-lion">aegean-lion</a> contains a nutrition-protocol interface. <a href="https://github.com/borsel2002/InoReg">InoReg</a> describes an RFID and object-detection attendance system. These are code archives, not verified deployments.</p></div><div><h3>Still studying</h3><p>B.Sc. Mathematics at İYTE. Topology, knot theory, machine learning and LLMs are ongoing interests, not a list of shipped research projects.</p><p class="sig"><a href="https://github.com/borsel2002?tab=repositories">All public repositories ↗</a></p></div></div>
+  </div>
+</section>
+<section id="directory">
+  <div class="wrap">
+    <span class="label">05 — Directory</span>
+    <h2>Three sites. Different jobs.</h2>
+    <div class="cards cards-3">
+      <a class="card" href="https://basarorsel.me"><div class="n">Identity</div><h3>basarorsel.me</h3><p>The person: mathematics, sport, current direction and contact.</p><div class="sig">meet the person →</div></a>
+      <a class="card" href="#projects"><div class="n">Portfolio / you are here</div><h3>basarorsel.com</h3><p>Training data, finished projects and public source code.</p><div class="sig">see the projects →</div></a>
+      <a class="card" href="https://orselstudio.tech"><div class="n">Work / Orsel Studio</div><h3>orselstudio.tech</h3><p>WooCommerce, AI/search optimization and complete websites. Business belongs there, not in the training log.</p><div class="sig">talk about work →</div></a>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:0 24px"><span>BAŞAR ÖRSEL · hand-coded · no frameworks or trackers</span><span id="genStamp"></span><span>white is the day · black is the night</span></div></footer>
+<noscript><div class="wrap"><p>JavaScript is off. The portfolio text is available above; charts need JavaScript. <a href="data.json">Read the training aggregate</a>.</p></div></noscript>
+<script>
+/* ---------- theme: auto by sun, manual override ---------- */
+const btn = document.getElementById('themeBtn');
+const modes = ['auto','light','dark'];
+let mode = localStorage.getItem('theme') || 'auto';
+function apply(){
+  const h = new Date().getHours();
+  const dark = mode==='dark' || (mode==='auto' && (h<7 || h>=19));
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  btn.textContent = mode.toUpperCase();
+}
+btn.onclick = () => { mode = modes[(modes.indexOf(mode)+1)%3]; localStorage.setItem('theme',mode); apply(); };
+apply(); setInterval(apply, 60000);
+
+/* ---------- page router: intro first, everything else via the menu ---------- */
+const SECTIONS = ['sports','data','projects','code','directory'];
+function route(){
+  const h = location.hash.replace('#','');
+  const valid = SECTIONS.includes(h);
+  const section = valid ? h : 'home';
+  document.documentElement.dataset.section = section;
+  document.getElementById('home').style.display = valid ? 'none' : '';
+  SECTIONS.forEach(s => document.getElementById(s).classList.toggle('active', valid && s===h));
+  document.querySelectorAll('nav .links a').forEach(a =>
+    a.classList.toggle('on', a.getAttribute('href') === '#'+h));
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', route);
+route();
+
+/* ---------- mobile menu ---------- */
+const menuBtn = document.getElementById('menuBtn');
+const links = document.getElementById('links');
+menuBtn.addEventListener('click', () => {
+  const open = links.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded', open);
+});
+links.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A') { links.classList.remove('open'); menuBtn.setAttribute('aria-expanded','false'); }
+});
+
+const D = __DATA__;
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const fmtPace = p => { const m=Math.floor(p), s=Math.round((p-m)*60); return `${m}:${String(s).padStart(2,'0')}`; };
+const fmtHM = min => `${Math.floor(min/60)}:${String(min%60).padStart(2,'0')}`;
+const monName = ym => new Date(ym+'-02').toLocaleString('en',{month:'long',year:'numeric'});
+const svgEl = (tag,attrs)=>{const e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
+
+
+/* ---------- KPI cards ---------- */
+function kpis(){
+  $('kpis').innerHTML = [
+    [T.run_n,'runs'],[T.run_km.toFixed(1)+' km','run distance'],[T.run_h+' h','run time'],
+    [T.kcal.toLocaleString('en'),'watch-estimated kcal'],[P.biggest_week_km+' km','biggest week'],
+    [P.biggest_month_km+' km','biggest month'],[T.ascent_m+' m','recorded ascent'],[P.max_hr+' bpm','max hr recorded'],
+  ].map(([v,k])=>`<div class="s"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+}
+
+/* ---------- monthly bar chart ---------- */
+function monthly(){
+  const svg=$('monChart'), M=D.monthly, W=980, H=220, pad=28, bw=(W-2*pad)/M.length;
+  const mx=Math.max(...M.map(m=>m.km));
+  M.forEach((m,i)=>{
+    const h=(m.km/mx)*(H-70), x=pad+i*bw;
+    svg.appendChild(svgEl('rect',{x:x+4,y:H-40-h,width:Math.max(bw-8,1),height:h,class:'bar',rx:1}));
+    if (bw > 26 || i % 2 === 0){
+      const t=svgEl('text',{x:x+bw/2,y:H-24,'text-anchor':'middle'});t.textContent=m.m.slice(2);svg.appendChild(t);
+    }
+    if (bw > 20){
+      const v=svgEl('text',{x:x+bw/2,y:H-48-h,'text-anchor':'middle'});v.textContent=m.km.toFixed(0);svg.appendChild(v);
+    }
+  });
+  svg.appendChild(svgEl('line',{x1:pad,y1:H-40,x2:W-pad,y2:H-40,class:'axis'}));
+  $('monSub').textContent=`km per month · peak ${P.biggest_month_km} km in ${monName(P.biggest_month)}`;
+}
+
+/* ---------- weekly bars ---------- */
+function weekly(){
+  const svg=$('wkChart'), Wk=D.weekly, W=470, H=190, pad=16, bw=(W-2*pad)/Wk.length;
+  const mx=Math.max(...Wk.map(w=>w.km));
+  Wk.forEach((w,i)=>{
+    const h=(w.km/mx)*(H-46);
+    svg.appendChild(svgEl('rect',{x:pad+i*bw+0.5,y:H-26-h,width:Math.max(bw-1,0.8),height:h,class:'bar'}));
+  });
+  svg.appendChild(svgEl('line',{x1:pad,y1:H-26,x2:W-pad,y2:H-26,class:'axis'}));
+  const t=svgEl('text',{x:pad,y:H-8});t.textContent=Wk[0].w;svg.appendChild(t);
+  const t2=svgEl('text',{x:W-pad,y:H-8,'text-anchor':'end'});t2.textContent=Wk[Wk.length-1].w;svg.appendChild(t2);
+  const t3=svgEl('text',{x:pad,y:14});t3.textContent=`peak ${mx} km`;svg.appendChild(t3);
+}
+
+/* ---------- efficiency: pace vs HR by quarter (auto-scaled) ---------- */
+function eff(){
+  const svg=$('effChart'), Q=D.quarterly, W=470, H=190, pad=40;
+  if (Q.length < 2) return;
+  const xs=i=>pad+i*(W-2*pad)/(Q.length-1);
+  const pMin=Math.min(...Q.map(q=>q.pace))-0.4, pMax=Math.max(...Q.map(q=>q.pace))+0.4;
+  const hMin=Math.min(...Q.map(q=>q.hr))-6,   hMax=Math.max(...Q.map(q=>q.hr))+6;
+  const yP=p=>20+(p-pMin)/(pMax-pMin)*(H-60);
+  const yH=h=>20+(hMax-h)/(hMax-hMin)*(H-60);
+  svg.appendChild(svgEl('polyline',{points:Q.map((q,i)=>`${xs(i)},${yP(q.pace)}`).join(' '),class:'ln'}));
+  svg.appendChild(svgEl('polyline',{points:Q.map((q,i)=>`${xs(i)},${yH(q.hr)}`).join(' '),class:'ln2'}));
+  Q.forEach((q,i)=>{
+    svg.appendChild(svgEl('circle',{cx:xs(i),cy:yP(q.pace),r:3,class:'dot'}));
+    const t=svgEl('text',{x:xs(i),y:H-8,'text-anchor':'middle'});t.textContent=q.q;svg.appendChild(t);
+    const v=svgEl('text',{x:xs(i),y:yP(q.pace)-8,'text-anchor':'middle'});v.textContent=fmtPace(q.pace);svg.appendChild(v);
+    const h=svgEl('text',{x:xs(i),y:yH(q.hr)+14,'text-anchor':'middle'});h.textContent=q.hr;svg.appendChild(h);
+  });
+}
+
+/* ---------- scatter: every run (auto-scaled) ---------- */
+function scatter(){
+  const svg=$('runScatter'), R=D.runs.filter(r=>r.pace && r.pace<12), W=980, H=240, pad=36;
+  if (!R.length) return;
+  const kmMax=Math.max(32, Math.ceil(Math.max(...R.map(r=>r.km))+1));
+  const pMin=Math.min(...R.map(r=>r.pace))-0.3, pMax=12;
+  const first=new Date(R[0].d).getTime(), last=new Date(R[R.length-1].d).getTime()||first+1;
+  R.forEach(r=>{
+    const x=pad+(r.km/kmMax)*(W-2*pad);
+    const y=16+(r.pace-pMin)/(pMax-pMin)*(H-52);
+    const age=(new Date(r.d).getTime()-first)/(Math.max(last-first,1));
+    const c=svgEl('circle',{cx:x,cy:y,r:3.2,class:'dot'});
+    c.setAttribute('opacity',(0.22+0.7*age).toFixed(2));
+    const tt=svgEl('title',{});tt.textContent=`${r.d} — ${r.km} km @ ${fmtPace(r.pace)}/km${r.hr?' · '+r.hr+' bpm':''}`;
+    c.appendChild(tt); svg.appendChild(c);
+  });
+  svg.appendChild(svgEl('line',{x1:pad,y1:H-30,x2:W-pad,y2:H-30,class:'axis'}));
+  [5,10,15,21.1,25,31,42.2,50].filter(k=>k<=kmMax).forEach(k=>{
+    const x=pad+(k/kmMax)*(W-2*pad);
+    const t=svgEl('text',{x:x,y:H-12,'text-anchor':'middle'});t.textContent=k+'k';svg.appendChild(t);
+  });
+  const t=svgEl('text',{x:pad,y:14});t.textContent='faster ↑';svg.appendChild(t);
+}
+
+/* ---------- tables ---------- */
+function tables(){
+  $('hmSub').textContent = `${D.hm.length} efforts ≥ 21 km`;
+  const best = P.fastest_hm ? P.fastest_hm.date : null;
+  $('hmTable').innerHTML = '<tr><th>date</th><th>km</th><th>time</th><th>pace</th><th>hr</th></tr>' +
+    D.hm.map(h=>`<tr${h.d===best?' class="hl"':''}><td>${h.d}</td><td>${h.km.toFixed(2)}</td><td>${fmtHM(h.min)}</td><td>${fmtPace(h.pace)}/km</td><td>${h.hr||'—'}</td></tr>`).join('');
+
+  // elevation profiles for the long runs (altitude from record frames)
+  const eps = D.hm.filter(h=>h.elev && h.elev.length>10);
+  $('elevProfiles').innerHTML = eps.map(h=>{
+    const W=440, H=56, xmax=h.elev[h.elev.length-1][0];
+    const as=h.elev.map(p=>p[1]), amin=Math.min(...as), amax=Math.max(...as), rng=Math.max(amax-amin,20);
+    const xy=h.elev.map(p=>`${(p[0]/xmax*W).toFixed(1)},${(6+(amax-p[1])/rng*(H-12)).toFixed(1)}`);
+    return `<div class="ep">
+      <div class="cap"><span>${h.d} · ${h.km.toFixed(1)} km</span><span>${h.gain!=null?h.gain+' m gain · ':''}${Math.round(amin)}–${Math.round(amax)} m</span></div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <polygon class="fill" points="0,${H} ${xy.join(' ')} ${W},${H}"/>
+        <polyline class="line" points="${xy.join(' ')}"/>
+      </svg></div>`;
+  }).join('');
+
+  const rows = [['Longest run', P.longest_km+' km', P.longest_date]];
+  // true best splits: fastest rolling window ever, from record frames
+  const BD = {k1:['Best 1 km',1], k5:['Best 5 km',5], k10:['Best 10 km',10], hm:['Best half marathon',21.0975]};
+  for (const [k,[name,km]] of Object.entries(BD)){
+    if (D.best && D.best[k]){
+      const s = D.best[k].s, t = s>=3600 ? `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`
+                                         : `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+      rows.push([name, `${t} · ${fmtPace(s/60/km)}/km`, D.best[k].d]);
+    }
+  }
+  rows.push(
+    ['Biggest week', P.biggest_week_km+' km', P.biggest_week],
+    ['Strength sessions', T.strength_n+' · '+T.strength_h+' h', 'in this snapshot'],
+    ['Walking (recovery)', T.walk_km+' km · '+T.walk_n+' walks', 'in this snapshot'],
+    ['Mobility / mind-body', T.mind_n+' sessions', 'in this snapshot']);
+  if (D.tri_day) rows.push(['Latest swim day', D.tri_day.items.map(i=>i.s+(i.km?` ${i.km} km`:'')).join(' + '), D.tri_day.date]);
+  $('prTable').innerHTML = '<tr><th>metric</th><th>value</th><th>when</th></tr>' +
+    rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+
+  $('truthNote').innerHTML = D.gap && D.gap.days > 7
+    ? `<b>Full disclosure:</b> the longest hole in the log is ${D.gap.days} days (${D.gap.from} → ${D.gap.to}). This is the interval between recorded training dates, not proof of inactivity.`
+    : `<b>For the record:</b> no gap in this log exceeds a week.`;
+}
+
+/* ---------- training load: Banister TRIMP -> CTL/ATL/TSB ---------- */
+function loadChart(){
+  const L = D.load || [];
+  if (L.length < 14){ $('loadPanel').style.display='none'; return; }
+  const svg=$('loadChart'), W=470, H=200, pad=34;
+  const mx = Math.max(...L.map(p=>Math.max(p.c,p.a)));
+  const mn = Math.min(0, ...L.map(p=>p.t));
+  const xs = i => pad + i*(W-2*pad)/(L.length-1);
+  const y  = v => 14 + (mx-v)/(mx-mn)*(H-52);
+  svg.appendChild(svgEl('line',{x1:pad,y1:y(0),x2:W-pad,y2:y(0),class:'axis'}));
+  svg.appendChild(svgEl('polyline',{points:L.map((p,i)=>`${xs(i)},${y(p.a)}`).join(' '),class:'ln2'}));
+  svg.appendChild(svgEl('polyline',{points:L.map((p,i)=>`${xs(i)},${y(p.c)}`).join(' '),class:'ln'}));
+  svg.appendChild(svgEl('polyline',{points:L.map((p,i)=>`${xs(i)},${y(p.t)}`).join(' '),class:'ln3'}));
+  const last = L[L.length-1];
+  [[L[0].d,pad,'start'],[last.d,W-pad,'end']].forEach(([d,x,a])=>{
+    const t=svgEl('text',{x:x,y:H-6,'text-anchor':a});t.textContent=d;svg.appendChild(t);});
+  const lg=svgEl('text',{x:pad,y:12});lg.textContent=`fitness ${last.c} · fatigue ${last.a} · form ${last.t>0?'+':''}${last.t}`;svg.appendChild(lg);
+  $('loadSub').textContent = `banister trimp · 42d/7d ewma · hrmax ${D.hr.max} (recorded) · hrrest ${D.hr.rest_assumed} (assumed)`;
+}
+
+/* ---------- aerobic decoupling per long run ---------- */
+function decChart(){
+  const Dc = D.dec || [];
+  if (Dc.length < 3){ $('decPanel').style.display='none'; return; }
+  const svg=$('decChart'), W=470, H=200, pad=34;
+  const first=new Date(Dc[0].d).getTime(), last=new Date(Dc[Dc.length-1].d).getTime()||first+1;
+  const vmax=Math.max(12, ...Dc.map(p=>Math.abs(p.v)));
+  const x = p => pad + (new Date(p.d).getTime()-first)/(Math.max(last-first,1))*(W-2*pad);
+  const y = v => 14 + (vmax-v)/(2*vmax)*(H-52);
+  svg.appendChild(svgEl('line',{x1:pad,y1:y(0),x2:W-pad,y2:y(0),class:'axis'}));
+  const five=svgEl('line',{x1:pad,y1:y(5),x2:W-pad,y2:y(5),class:'axis','stroke-dasharray':'3 4'});svg.appendChild(five);
+  const ft=svgEl('text',{x:W-pad,y:y(5)-4,'text-anchor':'end'});ft.textContent='+5%';svg.appendChild(ft);
+  Dc.forEach(p=>{
+    const c=svgEl('circle',{cx:x(p),cy:y(p.v),r:3,class:'dot'});
+    const tt=svgEl('title',{});tt.textContent=`${p.d} — ${p.km} km · ${p.v>0?'+':''}${p.v}%`;
+    c.appendChild(tt);svg.appendChild(c);
+  });
+  [[Dc[0].d,pad,'start'],[Dc[Dc.length-1].d,W-pad,'end']].forEach(([d,xx,a])=>{
+    const t=svgEl('text',{x:xx,y:H-6,'text-anchor':a});t.textContent=d;svg.appendChild(t);});
+}
+
+/* ---------- route maps: overlaid GPS traces per location cluster ----------
+   Density is the ink: each pass over the same street adds opacity, so the
+   streets I run most are the darkest. Black on white by day, white on
+   black by night — the theme system does the inversion for free.        */
+function routes(){
+  const R = (D.routes && D.routes.clusters) || [];
+  if (!R.length){ $('routesPanel').style.display = 'none'; return; }
+  const O = D.routes.other || {n:0,km:0};
+  const totKm = R.reduce((a,c)=>a+c.km,0), totN = R.reduce((a,c)=>a+c.n,0);
+  $('routesSub').textContent =
+    `${totN} GPS traces · ${totKm.toFixed(0)} km · repetition draws the darkness`
+    + (O.n ? ` · +${O.n} traces (${O.km.toFixed(0)} km) elsewhere` : '');
+  $('routeMaps').innerHTML = R.map((c,i)=>`
+    <figure class="map${i===0?' primary':''}">
+      <svg viewBox="0 0 ${c.w} ${c.h}" preserveAspectRatio="xMidYMid meet">
+        ${c.paths.map(p=>`<path class="rt${p.s==='swimming'?' swim':''}" d="${p.d}"/>`).join('')}
+      </svg>
+      <figcaption class="cap"><span>${c.label}</span><span>${c.n} traces · ${c.km.toFixed(0)} km</span></figcaption>
+    </figure>`).join('');
+}
+
+function drawAll(){ kpis(); monthly(); weekly(); eff(); scatter(); loadChart(); decChart(); routes(); tables(); }
+
+
+const T = D.totals, P = D.prs;
+const fmtTime = sec => sec>=3600 ? `${Math.floor(sec/3600)}:${String(Math.floor(sec%3600/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}` : `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+$('heroStats').innerHTML = [[T.run_km.toLocaleString('en')+' km','recorded running'],[T.workouts,'recorded workouts'],[T.hours+' h','logged training'],[D.best.k5 ? fmtTime(D.best.k5.s) : '—','best recorded 5 km']].map(([v,k])=>`<div class="s"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+$('fresh').textContent = `Snapshot generated ${D.generated} · ${D.meta.files} FIT files · not a live feed`;
+$('genStamp').textContent = `data generated ${D.generated}`;
+$('gateHint').textContent = `${T.workouts} workouts · ${T.run_n} runs · ${T.hours} hours · computed from ${D.meta.files} FIT files`;
+$('best5k').textContent = D.best.k5 ? `${fmtTime(D.best.k5.s)} · ${D.best.k5.d}` : 'No recorded 5 km split';
+$('longest').textContent = `${P.longest_km} km · ${P.longest_date}`;
+$('sportsDate').textContent = `Data generated ${D.generated}.`;
+$('provenance').textContent = `${D.meta.files} input files → ${D.meta.unique} unique workouts · generated ${D.generated}`;
+$('methodLink').onclick = e => { e.preventDefault(); $('methodology').open=true; $('methodology').scrollIntoView({behavior:'smooth',block:'start'}); };
+drawAll();
+// SVG titles support screen readers; native point titles retain raw values.
+for (const svg of document.querySelectorAll('#dash svg')) {
+  const title=svgEl('title',{});
+  title.textContent=svg.closest('.panel').querySelector('h4').textContent;
+  svg.prepend(title); svg.setAttribute('role','img'); svg.setAttribute('aria-label',title.textContent);
+}
+for (const el of document.querySelectorAll('nav .links a')) if(el.classList.contains('on')) el.setAttribute('aria-current','page');
+window.addEventListener('hashchange',()=>document.querySelectorAll('nav .links a').forEach(el=>el.classList.contains('on')?el.setAttribute('aria-current','page'):el.removeAttribute('aria-current')));
+document.addEventListener('keydown', e=>{if(e.key==='Escape'){links.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');}});
+
+</script>
+</body>
+</html>
