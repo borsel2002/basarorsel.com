@@ -6,6 +6,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 import json
+import os
 import tempfile
 from playwright.sync_api import sync_playwright
 
@@ -31,7 +32,8 @@ def main():
     servers = []
     urls = []
     for site in ('basarorsel.com', 'basarorsel.me'):
-        server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(ROOT/site)))
+        site_dir = Path(os.environ.get("BASAR_ME_PREVIEW", str(ROOT/site))) if site == "basarorsel.me" else ROOT/site
+        server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(site_dir)))
         Thread(target=server.serve_forever, daemon=True).start()
         servers.append(server)
         urls.append(f'http://127.0.0.1:{server.server_port}/')
@@ -62,8 +64,12 @@ def main():
                     if site=='com':
                         assert page.locator('#monChart rect').count()>0
                         assert page.locator('.break-point').count()>0
-                        assert page.locator('.muscle').count()==20
-                        for section in ('athlete','builder','identity','data'):
+                        for category in ('strength','mobility'):
+                            expected = page.evaluate('(c)=>Object.keys(D.muscle_load[c].all_time).sort()',category)
+                            actual = page.locator('#muscles-'+category+' [data-muscle]').evaluate_all('(els)=>[...new Set(els.map(e=>e.dataset.muscle))].sort()')
+                            assert actual==expected, (category,actual,expected)
+                            assert page.locator('#muscles-'+category+' .body-outline').count()==2
+                        for section in ('athlete','builder','identity','contact','data'):
                             page.evaluate('(s)=>location.hash=s', section)
                             page.wait_for_function('(s)=>document.documentElement.dataset.section===s', arg=section)
                             assert page.locator('section.active').get_attribute('id')==section
@@ -79,6 +85,17 @@ def main():
                         page.screenshot(path=str(screenshots/f'{site}-{width}-strength.png'),full_page=True)
                         page.locator('#tab-strength').press('Home')
                         assert page.locator('#tab-running').get_attribute('aria-selected')=='true'
+                    assert page.locator('nav a[href="https://basarorsel.'+('me' if site=='com' else 'com')+'"]').count()==1
+                    assert page.locator('footer a[href="https://basarorsel.'+('me' if site=='com' else 'com')+'"]').count()==1
+                    if site=='me' and page.locator('#about').count():
+                        for name in ('principles','academic','hobbies'):
+                            page.evaluate('(s)=>location.hash=s',name)
+                            page.wait_for_function('(s)=>!document.getElementById(s).hidden',arg=name)
+                            assert page.locator('#about').is_visible()
+                            assert page.locator('#'+name).is_visible()
+                            assert page.locator('#about [role=tabpanel]:visible').count()==1
+                        page.locator('#about-tab-hobbies').press('Home')
+                        page.wait_for_function("location.hash==='#principles'")
                     assert not errors, errors
                     assert not remote, remote
                     evidence.append({'site':site,'width':width,'signature':box,'js_errors':errors,'external_requests':remote})

@@ -40,5 +40,21 @@ class ImprovementTests(unittest.TestCase):
         self.assertEqual(cluster['paths'][0]['d'],cluster['paths'][1]['d'])
         self.assertTrue(all(0 <= p['x'] <= cluster['w'] for p in cluster['breakpoints']))
 
+    def test_swim_routes_metadata_and_missing_gps(self):
+        from fit_pipeline import swim_routes, build_routes
+        base = dict(start_time='2026-01-01T12:00:00+00:00', sport='swimming', total_distance=1500)
+        pts = [(38+i*.0001,27+i*.0001) for i in range(20)]
+        rows = [dict(base,sub_sport='open_water',pts=pts), dict(base,sub_sport='lap_swimming'),
+                dict(base,pts=[(38,27)]*5),dict(base,pts=pts),dict(base,sub_sport='lap_swimming',pts=pts)]
+        result = swim_routes(rows)
+        self.assertEqual(result[0]['kind'],'Open-water')
+        self.assertTrue(result[0]['map']['paths'])
+        self.assertEqual(result[1]['status'],'no GPS trace recorded')
+        self.assertIsNone(result[2]['map'])
+        self.assertEqual(result[3]['kind'],'Swim type not recorded')
+        self.assertIsNone(result[4]['map'])
+        self.assertEqual(build_routes([rows[0]])['clusters'],[])
+        self.assertEqual(result[0]['km'],1.5)
+
 if __name__ == '__main__':
     unittest.main()

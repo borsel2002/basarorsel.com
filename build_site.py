@@ -52,6 +52,18 @@ def discipline_log(summary, ascent=False):
 
 def multisport(data):
     swim = discipline_log(data['swim'])
+    swim += '<h4>Swim map / recorded GPS</h4><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Swim type comes from FIT metadata, not the shape of a trace. Sessions without GPS say “no GPS trace recorded”; pool GPS is not plotted.</p><div class="swim-maps">'
+    for session in data.get('swim_routes', []):
+        label = f"{session['date']} · {session['kind']} · {number(session['km'])} km"
+        swim += '<figure class="swim-map"><figcaption>' + escape(label) + '</figcaption>'
+        m = session['map']
+        if m:
+            swim += f'<svg viewBox="0 0 {m["w"]} {m["h"]}" role="img" aria-label="{escape(label)}"><title>{escape(label)}</title>'
+            swim += ''.join(f'<path d="{escape(p["d"])}"/>' for p in m['paths']) + '</svg>'
+        else:
+            swim += '<p class="sub">' + escape(session['status']) + '</p>'
+        swim += '</figure>'
+    swim += '</div>'
     bike = [s for s in data['sports'] if 'cycling' in s['sport'] or s['sport'] == 'biking']
     note = ('Cycling sessions are listed in the full training mix below.' if bike else
             'No cycling data in this FIT export. Swim + run only; no bike leg or bike totals are inferred.')

@@ -206,9 +206,15 @@ section .lead{margin-left:auto;margin-right:auto}
 .data-tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg)}
 [hidden]{display:none!important}.category-title{margin:42px 0 20px}
 .muscle-map{width:100%;max-width:640px;height:auto;display:block;margin:24px auto}
-.muscle-map text{fill:var(--fg);font:28px ui-monospace,monospace}.muscle-map .muscle{fill:var(--accent);stroke:var(--fg);stroke-width:1}
+.muscle-map text{fill:var(--fg);font:16px ui-monospace,monospace}.muscle-map .muscle{fill:var(--accent);stroke:var(--fg);stroke-width:1}
 .muscle-counts{display:flex;justify-content:center;gap:8px 18px;flex-wrap:wrap;font:12px ui-monospace,monospace}
 #routeMaps .break-point{fill:var(--bg);stroke:var(--fg);stroke-width:2}
+.swim-maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px}
+.swim-map{margin:0;padding:16px;border:1px solid var(--line)}
+.swim-map figcaption{font:12px ui-monospace,monospace;color:var(--mut)}
+.swim-map svg{width:100%;max-height:320px;margin-top:14px}
+.swim-map path{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.body-outline{fill:var(--card);stroke:var(--mut);stroke-width:1.5}
 </style>
 <noscript><style>section{display:block !important}.menu-btn,#themeBtn{display:none}.links{display:flex;position:static}.hero{min-height:auto}[role=tabpanel]{display:block !important}.data-tabs{display:none}</style></noscript>
 </head><body>
@@ -228,6 +234,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <a href="#builder">Builder</a>
       <a href="#data">Data</a>
       <a href="#identity">Identity</a>
+      <a href="#contact">Contact</a>
       <a href="https://basarorsel.me" style="color:var(--accent)">Person ↗</a>
       <button id="themeBtn" title="Theme: auto follows the sun — white is the day, black is the night">AUTO</button>
     </div>
@@ -376,7 +383,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
       <label>Window <select id="window-strength" aria-label="Strength heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
       <p id="summary-strength" class="sub"></p><svg id="muscles-strength" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Strength inferred muscle heatmap"></svg>
-      <p class="sub">Schematic muscle-group map, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
+      <p class="sub">Schematic body model, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
       <div id="counts-strength" class="muscle-counts"></div></div>
     </div>
     <div id="data-mobility" role="tabpanel" aria-labelledby="tab-mobility" hidden>
@@ -385,7 +392,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
       <label>Window <select id="window-mobility" aria-label="Mobility heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
       <p id="summary-mobility" class="sub"></p><svg id="muscles-mobility" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Mobility inferred muscle heatmap"></svg>
-      <p class="sub">Schematic muscle-group map, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
+      <p class="sub">Schematic body model, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
       <div id="counts-mobility" class="muscle-counts"></div></div>
     </div>
     <details id="methodology" class="panel methods">
@@ -441,6 +448,17 @@ section .lead{margin-left:auto;margin-right:auto}
   </div>
 </section>
 </main>
+<section id="contact">
+  <div class="wrap">
+    <span class="label">05 — Contact</span>
+    <h2>Say hello.</h2>
+    <p class="lead">Questions, ideas, a route worth running, or a problem worth solving — I read everything and reply when there is something to say.</p>
+    <div class="goal" style="margin-top:30px"><span class="g mono" style="font-size:clamp(16px,2.6vw,22px)"><a href="mailto:contact@basarorsel.me">contact@basarorsel.me</a></span><span class="st">personal</span></div>
+    <div class="goal"><span class="g mono" style="font-size:clamp(16px,2.6vw,22px)"><a href="mailto:contact@orselstudio.tech">contact@orselstudio.tech</a></span><span class="st">business</span></div>
+    <div class="goal"><span class="g mono" style="font-size:clamp(16px,2.6vw,22px)">İzmir, Türkiye</span><span class="st">38°N 27°E</span></div>
+  </div>
+</section>
+
 <footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:0 24px"><span>BAŞAR ÖRSEL · hand-coded · no frameworks or trackers</span><span id="genStamp"></span><span>the person → <a href="https://basarorsel.me">basarorsel.me</a> · white is the day · black is the night</span></div></footer>
 <noscript><div class="wrap"><p>JavaScript is off. The portfolio text is available above; charts need JavaScript. <a href="data.json">Read the training aggregate</a>.</p></div></noscript>
 <script>
@@ -458,7 +476,7 @@ btn.onclick = () => { mode = modes[(modes.indexOf(mode)+1)%3]; localStorage.setI
 apply(); setInterval(apply, 60000);
 
 /* ---------- page router: intro first, everything else via the menu ---------- */
-const SECTIONS = ['athlete','builder','data','identity'];
+const SECTIONS = ['athlete','builder','data','identity','contact'];
 function route(){
   const raw = location.hash.replace('#','');
   const h = ({sports:'athlete',projects:'builder',code:'builder',directory:'identity'})[raw] || raw;
@@ -721,15 +739,49 @@ function muscleMap(category){
   const load=D.muscle_load[category], window=$('window-'+category).value, counts=load[window];
   const svg=$('muscles-'+category);svg.replaceChildren();
   const title=svgEl('title',{});title.textContent=category+' inferred muscle heatmap: attributed sessions';svg.append(title);
-  // A schematic map: every approved group remains distinct, no anatomy claims.
-  const groups=Object.keys(counts), rows=Math.ceil(groups.length/2), rowH=66;
-  svg.setAttribute('viewBox',`0 0 640 ${rows*rowH+20}`);
+  // Hand-drawn schematic regions; broad core and specific abdominals remain distinct.
+  svg.setAttribute('viewBox','0 0 640 540');
   const max=Math.max(1,...Object.values(counts));
-  groups.forEach((name,i)=>{
-    const x=10+(i%2)*320,y=10+Math.floor(i/2)*rowH;
-    const g=svgEl('g',{}), rect=svgEl('rect',{x,y,width:300,height:52,rx:8,class:'muscle','fill-opacity':counts[name] ? (0.12+0.68*counts[name]/max).toFixed(2):0});
-    const tt=svgEl('title',{});tt.textContent=`${name}: ${counts[name]} attributed sessions`;g.append(rect,tt);
-    const text=svgEl('text',{x:x+150,y:y+30,'text-anchor':'middle'});text.textContent=name.replaceAll('-',' ');g.append(text);svg.append(g);
+  const silhouette='M145 84 C128 77 125 49 135 35 C146 20 174 20 185 35 C195 49 192 77 175 84 L179 99 C191 106 210 103 224 120 C236 140 238 170 245 194 L267 261 L263 287 Q258 300 251 284 L247 267 L226 218 L212 174 L207 227 Q225 262 216 300 L195 390 L188 471 L202 487 Q204 498 177 494 L167 483 L166 402 L160 323 L154 402 L153 483 L143 494 Q116 498 118 487 L132 471 L125 390 L104 300 Q95 262 113 227 L108 174 L94 218 L73 267 L69 284 Q62 300 57 287 L53 261 L75 194 C82 170 84 140 96 120 C110 103 129 106 141 99 Z';
+  const front={
+    'neck-flexors':'M146 86 L158 94 L155 113 L143 102 Z M162 94 L174 86 L177 102 L165 113 Z',
+    shoulders:'M136 108 Q105 105 96 130 L96 151 Q107 144 119 130 Z M184 108 Q215 105 224 130 L224 151 Q213 144 201 130 Z',
+    chest:'M124 121 Q140 112 157 119 L157 161 Q133 170 117 151 Z M196 121 Q180 112 163 119 L163 161 Q187 170 203 151 Z',
+    abdominals:'M145 171 L157 173 L157 194 L144 192 Z M163 173 L175 171 L176 192 L163 194 Z M144 198 L157 200 L157 221 L143 219 Z M163 200 L176 198 L177 219 L163 221 Z',
+    obliques:'M119 163 L139 176 L136 222 L121 237 L116 207 Z M201 163 L181 176 L184 222 L199 237 L204 207 Z',
+    core:'M138 227 Q160 236 182 227 L187 246 L160 262 L133 246 Z',
+    quads:'M115 266 Q133 258 148 271 L150 316 L138 380 L129 380 L111 304 Z M205 266 Q187 258 172 271 L170 316 L182 380 L191 380 L209 304 Z',
+    calves:'M131 404 L147 400 L145 458 L136 466 Z M189 404 L173 400 L175 458 L184 466 Z'
+  };
+  const back={
+    'neck-extensors':'M146 86 L157 89 L157 109 L142 103 Z M174 86 L163 89 L163 109 L178 103 Z',
+    'upper-traps':'M141 108 L157 115 L157 150 L120 120 Z M179 108 L163 115 L163 150 L200 120 Z',
+    shoulders:front.shoulders,
+    back:'M116 135 L151 159 L156 213 L135 221 L117 185 Z M204 135 L169 159 L164 213 L185 221 L203 185 Z',
+    'lower-back':'M140 222 L158 218 L158 247 L130 250 Z M180 222 L162 218 L162 247 L190 250 Z',
+    glutes:'M125 255 Q143 250 157 260 L157 294 Q132 310 113 292 Z M195 255 Q177 250 163 260 L163 294 Q188 310 207 292 Z',
+    hamstrings:'M114 307 L148 310 L143 352 L137 383 L128 382 Z M206 307 L172 310 L177 352 L183 383 L192 382 Z',
+    calves:'M128 398 Q140 390 149 402 L145 441 L136 463 L129 438 Z M192 398 Q180 390 171 402 L175 441 L184 463 L191 438 Z'
+  };
+  const mobility={
+    hips:front.core+' '+back.glutes,
+    spine:'M155 114 L165 114 L166 248 L154 248 Z',
+    shoulders:front.shoulders,
+    ankles:'M132 460 L149 460 L149 479 L132 479 Z M188 460 L171 460 L171 479 L188 479 Z',
+    wrists:'M59 250 L75 254 L70 269 L54 265 Z M261 250 L245 254 L250 269 L266 265 Z',
+    neck:'M145 87 L175 87 L179 105 L141 105 Z'
+  };
+  [front,back].forEach((regions,i)=>{
+    const figure=svgEl('g',{transform:`translate(${i*320} 16)`});
+    figure.append(svgEl('path',{d:silhouette,class:'body-outline'}));
+    const caption=svgEl('text',{x:160,y:510,'text-anchor':'middle'});caption.textContent=i?'Back':'Front';figure.append(caption);
+    const chosen=category==='strength'?regions:Object.fromEntries(Object.entries(mobility).filter(([n])=>n!=='spine'||i===1));
+    Object.entries(chosen).forEach(([name,d])=>{
+      const n=counts[name]||0;
+      const region=svgEl('path',{d,class:'muscle','data-muscle':name,'fill-opacity':n?(0.12+0.78*n/max).toFixed(2):0});
+      const tt=svgEl('title',{});tt.textContent=`${name}: ${n} attributed sessions`;region.append(tt);figure.append(region);
+    });
+    svg.append(figure);
   });
   $('summary-'+category).textContent=`${load.matched_sessions} attributed sessions (${load.historical_sessions} historical, ${load.logged_sessions} logged); ${load.unmatched_sessions} unmatched. Recent window: ${D.muscle_load.recent_from}–${D.muscle_load.as_of}, relative to the latest workout, not today.`;
   const target=$('counts-'+category);target.replaceChildren();

@@ -279,7 +279,7 @@ def rdp(points, tol):
     return [p for p, k in zip(points, keep) if k]
 
 
-def build_routes(ws):
+def build_routes(ws, min_traces=3):
     """Cluster GPS traces by location and render each cluster as SVG paths."""
     traces = []
     for w in ws:
@@ -312,7 +312,7 @@ def build_routes(ws):
             clusters.append({"cx": t["cx"], "cy": t["cy"], "tr": [t]})
 
     clusters.sort(key=lambda c: -sum(t["km"] for t in c["tr"]))
-    shown = [c for c in clusters if len(c["tr"]) >= 3][:4]
+    shown = [c for c in clusters if len(c["tr"]) >= min_traces][:4]
     rest = [c for c in clusters if c not in shown]
 
     def pct(vals, lo, hi):
@@ -365,6 +365,34 @@ def build_routes(ws):
     return {"clusters": out, "other": other,
             "breakpoint_count": sum(len(w.get("breakpoints", [])) for w in ws),
             "breakpoint_method": "Likely stops / break points: speed <0.5 m/s for >120s; GPS gaps >30s excluded"}
+
+
+def swim_routes(ws):
+    """One map per swim; never infer pool/open water from GPS presence."""
+    sessions = []
+    for w in ws:
+        sub = w.get('sub_sport')
+        kind = ('Pool' if sub == 'lap_swimming' else
+                'Open-water' if sub == 'open_water' or w.get('sport') == 'open_water_swimming'
+                else 'Swim type not recorded')
+        pts = w.get('pts') or []
+        usable = [p for p in pts if len(p) == 2 and all(math.isfinite(v) for v in p)
+                  and -90 <= p[0] <= 90 and -180 <= p[1] <= 180 and p != (0, 0) and p != [0, 0]]
+        maps = []
+        if kind != 'Pool' and len(usable) >= 4:
+            maps = build_routes([dict(w, pts=usable)], min_traces=1)['clusters']
+        if maps:
+            status = None
+        elif kind == 'Pool' and pts:
+            status = 'Pool session: GPS trace not displayed'
+        elif not pts:
+            status = 'no GPS trace recorded'
+        else:
+            status = 'no usable GPS trace recorded'
+        sessions.append({'date': dt(w).date().isoformat(), 'kind': kind,
+                         'km': None if w.get('total_distance') is None else round(w['total_distance']/1000, 3),
+                         'map': maps[0] if maps else None, 'status': status})
+    return sessions
 
 
 def dt(w):
@@ -589,6 +617,7 @@ def aggregate(parsed):
         "routine_method": "Muscle exposure inferred by matching workout timestamps/dates against routines.md; historical sessions use the approved routine union. Programmatic estimate, not biometric measurement.",
         "hiking": sport_summary(hikes, sessions=True),
         "swim": sport_summary(swims, sessions=True),
+        "swim_routes": swim_routes(swims),
         "totals": {
             "workouts": len(ws),
             "hours": round(sum(w.get("total_timer_time", 0) for w in ws) / 3600),
