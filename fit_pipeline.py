@@ -93,7 +93,12 @@ def detect_breakpoints(records):
         prev = records[i-1] if i else None
         gap = p[2]-prev[2] if prev else None
         if gap is not None and not 0 < gap <= 30:
+            # Gap breaks evidence: flush, then evaluate this point on its own
+            # explicit speed only — never derive speed across missing coverage.
             finish(); slow = []
+            speed = p[3]
+            if speed is not None and speed < 0.5:
+                slow.append(p)
             continue
         speed = p[3]
         if speed is None and prev and gap:

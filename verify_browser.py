@@ -11,9 +11,20 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Public site assets only — never serve data.json, FIT files, or list directories.
+ALLOW = {'/', '/index.html', '/signature.svg', '/logo.svg', '/favicon.svg',
+         '/favicon.ico', '/brand-logo-light.svg', '/brand-logo-dark.svg'}
+
 class QuietHandler(SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
+
+    def do_GET(self):
+        path = self.path.split('?', 1)[0]
+        if path not in ALLOW:
+            self.send_error(404, 'Not Found')
+            return
+        super().do_GET()
 
 
 def main():

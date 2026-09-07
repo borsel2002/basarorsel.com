@@ -12,6 +12,9 @@ class ImprovementTests(unittest.TestCase):
         self.assertEqual(detect_breakpoints(records[:13]), [])
         self.assertEqual(detect_breakpoints([(38,27,0,0),(38,27,180,0)]), [])
         self.assertEqual(detect_breakpoints([(38,27,t,1) for t in range(151)]), [])
+        # stop immediately after a GPS gap: first valid sample must not be dropped
+        gap_then_stop = [(38,27,0,0.0),(38,27,60,0.0),(38,27,90,0.0),(38,27,120,0.0),(38,27,150,0.0),(38,27,180,0.0),(38,27,190,0.0)]
+        self.assertEqual(detect_breakpoints(gap_then_stop)[0]['duration_s'], 130)
 
     def test_routine_history_future_and_exact_precedence(self):
         from fit_pipeline import load_routine_rules, muscle_summary
