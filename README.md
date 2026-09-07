@@ -34,6 +34,10 @@ Every displayed training statistic comes from `const D` embedded in the page. Ex
 
 The dashboard contains monthly and weekly volume, quarterly pace/HR means, per-run scatter, Banister TRIMP load curves, decoupling, route-density drawings, long-run elevation profiles and record tables. Chart filtering and physiological assumptions are documented beside the charts and in the expandable Methods section. GPS rolling splits are not certified race results. Resting HR is assumed; the highest logged HR is not necessarily physiological HRmax. Missing logs do not establish inactivity. Raw route traces are reduced to projected SVG paths; they remain potentially identifying.
 
+The Sports page also contains build-time-rendered hiking/mountaineering and swim logs, plus an exhaustive discipline table. `hiking` and `swim` contain `count`, `hours`, `km`, `ascent_m`, `recorded` coverage counts and `sessions` (`date`, `km`, `ascent_m`, `duration_s`). `sports` contains one row per display category / original FIT sport, with `category`, `sport`, `sub_sports` and the same summary fields. Categories are exclusive: yoga, flexibility and Pilates sub-sports take precedence over the broad FIT `training` label. Generic records remain labeled generic under Other; filenames are not used to guess missing sport metadata.
+
+Durations use session timer time; distances and ascent use session totals with no inferred values or GPS fallback. Missing measurements are null, not zero; partial sums display their recorded-session coverage. Summary values round only after aggregation (three decimals); individual session rounding can produce small sum differences. The swim-plus-run block is not proof of a completed triathlon; the no-cycling notice is conditional on the dataset. The existing `tri_day` key remains a latest-swim-day marker, accepting both swimming sport encodings. New multisport tables are embedded as HTML as well as JSON, with no runtime dependencies.
+
 The aggregate contains dates, heart-rate summaries and route shapes and is deliberately public. Do not put raw watch files, credentials or unrelated health data in this repo.
 
 ## Deployment

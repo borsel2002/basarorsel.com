@@ -259,15 +259,52 @@ def pace(w):
     return round(1000 / s / 60, 3) if s else None
 
 
+def sport_category(w):
+    """Exclusive display groups; retain original FIT sport labels separately."""
+    sport = str(w.get("sport") or "unknown")
+    sub = str(w.get("sub_sport") or "")
+    mind = {"fitness_equipment", "yoga", "flexibility", "flexibility_training",
+            "pilates", "mind_and_body"}
+    if sport in mind or sub in mind:
+        return "mind_and_body"
+    if "training" in sport:
+        return "strength"
+    if sport in ("swimming", "open_water_swimming"):
+        return "swimming"
+    return 'other' if sport in ('generic', 'unknown', 'other') else sport
+
+
+def sport_summary(ws, sessions=False):
+    """Sum recorded session fields only. Null is unrecorded, not zero.
+
+    Coverage accompanies each sum so partial recordings are never presented as
+    complete measurements. Duration is timer time, not elapsed wall-clock time.
+    """
+    fields = {"hours": ("total_timer_time", 3600),
+              "km": ("total_distance", 1000), "ascent_m": ("total_ascent", 1)}
+    out = {"count": len(ws), "recorded": {}}
+    for key, (field, divisor) in fields.items():
+        values = [w[field] for w in ws if w.get(field) is not None]
+        out["recorded"][key] = len(values)
+        out[key] = round(sum(values) / divisor, 3) if values else None
+    if sessions:
+        out["sessions"] = [
+            {"date": dt(w).date().isoformat(),
+             "km": round(w["total_distance"] / 1000, 3) if w.get("total_distance") is not None else None,
+             "ascent_m": w.get("total_ascent"), "duration_s": w.get("total_timer_time")}
+            for w in ws]
+    return out
+
+
 def aggregate(parsed):
     # Dedupe: the same workout often exists from several sync apps.
-    # Same start_time -> keep the record with the most fields.
+    # Same start_time + sport -> keep the record with the most fields.
     by_start = {}
     score = lambda w: ("pts" in w, len(w))  # prefer records that carry a GPS trace
     for w in parsed:
         if "error" in w or "start_time" not in w:
             continue
-        k = w["start_time"]
+        k = (w["start_time"], w.get("sport"))
         if k not in by_start or score(w) > score(by_start[k]):
             by_start[k] = w
     ws = sorted(by_start.values(), key=lambda w: w["start_time"])
@@ -276,9 +313,18 @@ def aggregate(parsed):
 
     runs = [w for w in ws if w.get("sport") == "running"]
     walks = [w for w in ws if w.get("sport") == "walking"]
-    strength = [w for w in ws if "training" in str(w.get("sport", ""))]
-    mind = [w for w in ws if w.get("sport") == "fitness_equipment"
-            or w.get("sub_sport") in ("yoga", "flexibility_training")]
+    strength = [w for w in ws if sport_category(w) == "strength"]
+    mind = [w for w in ws if sport_category(w) == "mind_and_body"]
+    hikes = [w for w in ws if w.get("sport") == "hiking"]
+    swims = [w for w in ws if w.get("sport") in ("swimming", "open_water_swimming")]
+    groups = collections.defaultdict(list)
+    for w in ws:
+        groups[(sport_category(w), str(w.get("sport") or "unknown"))].append(w)
+    sports = [dict(category=category, sport=sport,
+                   sub_sports=sorted({str(w["sub_sport"]) for w in items if w.get("sub_sport")}),
+                   **sport_summary(items))
+              for (category, sport), items in sorted(groups.items())]
+    assert sum(s["count"] for s in sports) == len(ws)
 
     run_pts = [{"d": dt(w).strftime("%Y-%m-%d"), "km": round(w.get("total_distance", 0) / 1000, 2),
                 "pace": pace(w), "hr": w.get("avg_heart_rate"),
@@ -359,9 +405,9 @@ def aggregate(parsed):
                 "gain": w.get("total_ascent") or elev_gain(w.get("elev")),
                 "elev": w.get("elev")} for w in r21]
 
-    # triathlon marker: most recent open-water swim day, with that day's sessions
+    # Swim-day marker, not proof of a completed triathlon or a bike leg.
     tri = None
-    swims = [w for w in ws if w.get("sport") == "swimming"]
+
     if swims:
         day = dt(swims[-1]).date()
         items = [{"s": (w.get("sport") or "").replace("_", " "),
@@ -419,6 +465,9 @@ def aggregate(parsed):
     return {
         "generated": datetime.date.today().isoformat(),
         "meta": {"files": len(parsed), "unique": len(ws)},
+        "sports": sports,
+        "hiking": sport_summary(hikes, sessions=True),
+        "swim": sport_summary(swims, sessions=True),
         "totals": {
             "workouts": len(ws),
             "hours": round(sum(w.get("total_timer_time", 0) for w in ws) / 3600),
