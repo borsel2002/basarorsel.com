@@ -7,6 +7,51 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 class SiteTests(unittest.TestCase):
+    def test_discipline_tabs_and_static_integrity(self):
+        from html.parser import HTMLParser
+
+        class Elements(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.elements = []
+
+            def handle_starttag(self, tag, attrs):
+                self.elements.append((tag, dict(attrs)))
+
+        html = (HERE / 'index.html').read_text()
+        parser = Elements()
+        parser.feed(html)
+        elements = parser.elements
+        ids = [a['id'] for _, a in elements if 'id' in a]
+        self.assertEqual(len(ids), len(set(ids)), 'duplicate IDs')
+        for tag, attrs in elements:
+            for key in ('aria-controls', 'aria-labelledby'):
+                for target in attrs.get(key, '').split():
+                    self.assertIn(target, ids)
+            href = attrs.get('href', '')
+            if href.startswith('#') and len(href) > 1:
+                self.assertIn(href[1:], ids, 'broken hash target')
+            self.assertFalse(tag == 'script' and 'src' in attrs)
+            self.assertFalse(tag == 'link' and 'stylesheet' in attrs.get('rel', '').split())
+        tabs = [a for _, a in elements if a.get('role') == 'tab']
+        names = ['running', 'swimming', 'cycling', 'mountaineering', 'strength', 'mobility', 'records']
+        self.assertEqual([a['id'] for a in tabs], ['tab-' + n for n in names])
+        for name in names:
+            panel = next(a for _, a in elements if a.get('id') == 'data-' + name)
+            self.assertEqual(panel['role'], 'tabpanel')
+            self.assertEqual(panel['aria-labelledby'], 'tab-' + name)
+            self.assertEqual('hidden' in panel, name != 'running')
+        self.assertNotIn('data-triathlon', html)
+        self.assertNotIn('tab-triathlon', html)
+        swim = html.split('id="data-swimming"', 1)[1].split('id="data-cycling"', 1)[0]
+        cycling = html.split('id="data-cycling"', 1)[1].split('id="data-mountaineering"', 1)[0]
+        from build_site import multisport
+        rendered = multisport(json.loads((HERE / 'data.json').read_text()))
+        self.assertIn(rendered['__SWIM__'], swim)
+        self.assertIn('No cycling data in this FIT export', cycling)
+        self.assertNotIn('No cycling data', swim)
+        self.assertNotRegex(html, r'__[A-Z_]+__|(?i:sprint[- ]orienteer)')
+
     def test_embedded_training_snapshot_and_routes(self):
         path = HERE / 'index.html'
         self.assertTrue(path.exists(), 'portfolio index.html has not been built')
@@ -51,9 +96,9 @@ class MultiSportTests(unittest.TestCase):
         self.assertEqual(empty['sessions'], [])
         self.assertIsNone(empty['hours'])
         data = {'hiking': empty, 'swim': empty, 'sports': []}
-        self.assertIn('No cycling data', multisport(data)['__SWIM__'])
+        self.assertIn('No cycling data', multisport(data)['__CYCLING__'])
         data['sports'] = [dict(sport_summary([{}]), category='cycling', sport='cycling', sub_sports=[])]
-        self.assertNotIn('No cycling data', multisport(data)['__SWIM__'])
+        self.assertNotIn('No cycling data', multisport(data)['__CYCLING__'])
 
     def test_unreadable_fit_aborts_without_publishing(self):
         import subprocess

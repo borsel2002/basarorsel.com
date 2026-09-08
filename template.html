@@ -288,8 +288,9 @@ section .lead{margin-left:auto;margin-right:auto}
 
     <div class="data-tabs" role="tablist" aria-label="Training discipline">
       <button id="tab-running" role="tab" aria-controls="data-running" aria-selected="true" data-tab="running">Running</button>
+      <button id="tab-swimming" role="tab" aria-controls="data-swimming" aria-selected="false" tabindex="-1" data-tab="swimming">Swimming</button>
+      <button id="tab-cycling" role="tab" aria-controls="data-cycling" aria-selected="false" tabindex="-1" data-tab="cycling">Cycling</button>
       <button id="tab-mountaineering" role="tab" aria-controls="data-mountaineering" aria-selected="false" tabindex="-1" data-tab="mountaineering">Mountaineering</button>
-      <button id="tab-triathlon" role="tab" aria-controls="data-triathlon" aria-selected="false" tabindex="-1" data-tab="triathlon">Triathlon</button>
       <button id="tab-strength" role="tab" aria-controls="data-strength" aria-selected="false" tabindex="-1" data-tab="strength">Strength</button>
       <button id="tab-mobility" role="tab" aria-controls="data-mobility" aria-selected="false" tabindex="-1" data-tab="mobility">Mobility</button>
       <button id="tab-records" role="tab" aria-controls="data-records" aria-selected="false" tabindex="-1" data-tab="records">Records</button>
@@ -373,18 +374,23 @@ section .lead{margin-left:auto;margin-right:auto}
     </div>
 
     </div>
+    <div id="data-swimming" role="tabpanel" aria-labelledby="tab-swimming" hidden>
+    <div class="panel" id="swimPanel">
+      <h4>Swimming / recorded training</h4>
+      <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
+      __SWIM__
+    </div>
+    </div>
+    <div id="data-cycling" role="tabpanel" aria-labelledby="tab-cycling" hidden>
+      <div class="panel" id="cyclingPanel">
+        <h4>Cycling / export coverage</h4>
+        __CYCLING__
+      </div>
+    </div>
     <div id="data-mountaineering" role="tabpanel" aria-labelledby="tab-mountaineering" hidden>    <div class="panel" id="hikingPanel">
       <h4>Mountaineering / hiking</h4>
       <p class="sub">Mountaineering is inferred from FIT hiking and recorded ascent, not a distinct mountaineering sport. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
       __HIKING__
-    </div>
-    </div>
-    <div id="data-triathlon" role="tabpanel" aria-labelledby="tab-triathlon" hidden>
-    <p class="method-note">No cycling data exists in this export. Swim + run records do not establish a completed triathlon or a bike split.</p>
-    <div class="panel" id="swimPanel">
-      <h4>Triathlon / swim + run</h4>
-      <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
-      __SWIM__
     </div>
     </div>
     <div id="data-strength" role="tabpanel" aria-labelledby="tab-strength" hidden>

@@ -292,8 +292,8 @@ def multisport(data):
     swim += '</div>'
     bike = [s for s in data['sports'] if 'cycling' in s['sport'] or s['sport'] == 'biking']
     note = ('Cycling sessions are listed in the full training mix below.' if bike else
-            'No cycling data in this FIT export. Swim + run only; no bike leg or bike totals are inferred.')
-    swim += f'<p class="goalnote">{note}</p>'
+            'No cycling data in this FIT export. A bike split is not claimed; triathlon-oriented training here means swim + run only.')
+    cycling = f'<p class="goalnote">{note}</p>'
     running = [s for s in data['sports'] if s['sport'] == 'running']
     swim += '<p class="goalnote">Running record: ' + '; '.join(
         f'{s["count"]} runs · {metric(s, "km")} km · {metric(s, "hours")} h' for s in running) + '. <a href="#data" data-running-link>Running dashboard →</a></p>'
@@ -302,7 +302,7 @@ def multisport(data):
              metric(s, 'hours'), metric(s, 'km'), metric(s, 'ascent_m')] for s in data['sports']]
     hiking = discipline_receipts(disciplines.get('mountaineering'), 'mountaineering') if disciplines else discipline_log(data['hiking'], ascent=True)
     hiking += hike_maps_and_profiles(data)
-    return {'__HIKING__': hiking, '__SWIM__': swim,
+    return {'__HIKING__': hiking, '__SWIM__': swim, '__CYCLING__': cycling,
             '__STRENGTH__': discipline_receipts(disciplines.get('strength'), 'strength'),
             '__MOBILITY__': discipline_receipts(disciplines.get('mobility'), 'mobility'),
             '__SPORTS__': table(['Discipline', 'FIT sport', 'Sub-sports', 'Sessions', 'Hours', 'km', 'Ascent / m'], rows),

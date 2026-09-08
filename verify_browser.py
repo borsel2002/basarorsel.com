@@ -73,7 +73,7 @@ def main():
                             page.evaluate('(s)=>location.hash=s', section)
                             page.wait_for_function('(s)=>document.documentElement.dataset.section===s', arg=section)
                             assert page.locator('section.active').get_attribute('id')==section
-                        for tab in ('running','mountaineering','triathlon','strength','mobility'):
+                        for tab in ('running','swimming','cycling','mountaineering','strength','mobility','records'):
                             page.locator('#tab-'+tab).click()
                             assert page.locator('#data-'+tab).is_visible()
                             assert page.locator('[role=tabpanel]:visible').count()==1
