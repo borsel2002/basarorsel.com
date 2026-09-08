@@ -81,7 +81,8 @@ class DisciplineReceiptsTests(unittest.TestCase):
         self.assertIn('0:10:00', html)
         self.assertIn('Most sessions / week', html)
         self.assertIn('not current fitness', html)
-        self.assertIn('<title>', html)
+        self.assertIn('<div class="kpis">', html)
+        self.assertIn('<details><summary>Recorded periods and session receipts</summary>', html)
 
 
 if __name__ == '__main__':

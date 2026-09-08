@@ -104,7 +104,7 @@ def discipline_receipts(summary, kind):
         cards.append(('Total elevation gained / m', receipt_metric(summary, 'ascent_m')))
     if kind == 'swim':
         cards.append(('Pace / timer time', swim_pace(summary['pace_s_100m'])))
-    html = table(['Recorded volume', 'Value'], cards)
+    html = '<div class="kpis">' + ''.join('<div class="s"><div class="v">' + escape(value) + '</div><div class="k">' + escape(label) + '</div></div>' for label, value in cards) + '</div>'
     html += '<p class="sub">Dates and calendar periods: Europe/Istanbul. Durations are timer time, excluding pauses. Partial totals identify measurement coverage.</p>'
     if kind == 'swim':
         html += f'<p class="sub">Distance-weighted pace uses paired positive distance and timer time: {summary["pace_recorded"]}/{summary["count"]} sessions. Pool and open-water conditions are not equivalent; this is whole-session pace, not a fastest split.</p>'
@@ -124,12 +124,8 @@ def discipline_receipts(summary, kind):
         best_rows.append([label, formatter(b['value']) if b else 'No data recorded',
                           (', '.join(b['dates']) + ''.join(f' [{c["date"]}: {c["recorded"]}/{c["total"]} sessions measured]' for c in b.get('winning_coverage', []))) if b else 'No data recorded',
                           f'{b["recorded"]}/{b["total"]}' if b else 'No data recorded'])
-    html += table(['Best', 'Value', 'Date / period (all ties)', 'Measured / eligible'], best_rows)
-    html += '<h3>Training over time</h3>'
-    if kind == 'mountaineering':
-        html += receipt_chart(summary['sessions'], 'ascent_m', 'Per-session ascent / m')
-    else:
-        html += receipt_chart(summary['monthly'], 'duration_s', 'Monthly timer seconds')
+    html += '<div class="kpis">' + ''.join('<div class="s"><div class="v">' + escape(value) + '</div><div class="k">' + escape(label) + '</div><p class="sub">' + escape(dates) + ' · ' + escape(coverage) + ' measured / eligible</p></div>' for label, value, dates, coverage in best_rows) + '</div>'
+    html += '<details><summary>Recorded periods and session receipts</summary>'
     html += table(['Month', 'Sessions', 'Timer hours (coverage)'], [
         [r['date'], r['count'], receipt_number(r['duration_s'] / 3600 if r['duration_s'] is not None else None) + f' ({r["recorded"]["duration_s"]}/{r["count"]} recorded)']
         for r in summary['monthly']])
@@ -143,7 +139,7 @@ def discipline_receipts(summary, kind):
         if endurance:
             row += [receipt_number(r['km']), receipt_number(r['ascent_m']) if kind == 'mountaineering' else swim_pace(r['pace_s_100m'])]
         rows.append(row)
-    return html + (table(headers, rows) if rows else '<p>No data recorded for this discipline.</p>')
+    return html + (table(headers, rows) if rows else '<p>No data recorded for this discipline.</p>') + '</details>'
 
 def hike_maps_and_profiles(data):
     html = '<h3>Hike maps / recorded GPS</h3><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Sessions without GPS say "no GPS trace recorded".</p><div class="swim-maps">'

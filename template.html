@@ -295,6 +295,7 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
 .skip-link{position:fixed;top:-100px;left:16px;z-index:100;background:var(--bg);padding:10px}
 .skip-link:focus{top:8px}
 .chart-scroll{overflow-x:auto;max-width:100%}
+.discipline-charts{margin:24px 0}.discipline-charts svg{width:100%;min-width:480px;display:block}.kpis .sub{overflow-wrap:anywhere}
 @media(max-width:720px){.panel{padding:18px 14px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .v{font-size:21px}.kpis .s{padding:14px}#monChart,#runScatter{min-width:660px}.chart-scroll{overflow-x:auto}.brand span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body,.card{transition:none}}
 /* Shared identity layout: keep identical on .com and .me. */
@@ -486,7 +487,8 @@ section .lead{margin-left:auto;margin-right:auto}
     <div class="panel" id="swimPanel">
       <h3>Swimming / recorded training</h3>
       <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
-      __SWIM__
+      <div class="grid2 discipline-charts"><div><h3>Per-session distance</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="swim per-session distance"><svg id="swimDistanceChart" viewBox="0 0 560 240" role="img" aria-label="swim per-session distance / km"></svg></div><p class="sub" id="swimDistanceChartNote"></p></div><div><h3>Whole-session pace</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="swim whole-session pace"><svg id="swimPaceChart" viewBox="0 0 560 240" role="img" aria-label="swim whole-session pace / s/100m"></svg></div><p class="sub" id="swimPaceChartNote"></p></div></div>
+__SWIM__
     </div>
     </div>
     <div id="data-cycling" role="tabpanel" aria-labelledby="tab-cycling" hidden>
@@ -498,11 +500,13 @@ section .lead{margin-left:auto;margin-right:auto}
     <div id="data-mountaineering" role="tabpanel" aria-labelledby="tab-mountaineering" hidden>    <div class="panel" id="hikingPanel">
       <h3>Mountaineering / hiking</h3>
       <p class="sub">Mountaineering is inferred from FIT hiking and recorded ascent, not a distinct mountaineering sport. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
-      __HIKING__
+      <div class="grid2 discipline-charts"><div><h3>Per-session distance</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mountaineering per-session distance"><svg id="mountaineeringDistanceChart" viewBox="0 0 560 240" role="img" aria-label="mountaineering per-session distance / km"></svg></div><p class="sub" id="mountaineeringDistanceChartNote"></p></div><div><h3>Per-session ascent</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mountaineering per-session ascent"><svg id="mountaineeringAscentChart" viewBox="0 0 560 240" role="img" aria-label="mountaineering per-session ascent / m"></svg></div><p class="sub" id="mountaineeringAscentChartNote"></p></div><div><h3>Monthly recorded ascent</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mountaineering monthly recorded ascent"><svg id="mountaineeringMonthlyAscentChart" viewBox="0 0 560 240" role="img" aria-label="mountaineering monthly recorded ascent / m"></svg></div><p class="sub" id="mountaineeringMonthlyAscentChartNote"></p></div></div>
+__HIKING__
     </div>
     </div>
     <div id="data-strength" role="tabpanel" aria-labelledby="tab-strength" hidden>
-      <div class="panel"><h3>Strength / recorded training</h3>__STRENGTH__</div>
+      <div class="panel"><h3>Strength / recorded training</h3><div class="grid2 discipline-charts"><div><h3>Monthly sessions</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="strength monthly sessions"><svg id="strengthMonthlyCountChart" viewBox="0 0 560 240" role="img" aria-label="strength monthly sessions / sessions"></svg></div><p class="sub" id="strengthMonthlyCountChartNote"></p></div><div><h3>Monthly timer hours</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="strength monthly timer hours"><svg id="strengthMonthlyHoursChart" viewBox="0 0 560 240" role="img" aria-label="strength monthly timer hours / h"></svg></div><p class="sub" id="strengthMonthlyHoursChartNote"></p></div><div><h3>Weekly frequency</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="strength weekly frequency"><svg id="strengthWeeklyCountChart" viewBox="0 0 560 240" role="img" aria-label="strength weekly frequency / sessions"></svg></div><p class="sub" id="strengthWeeklyCountChartNote"></p></div></div>
+__STRENGTH__</div>
       <div class="panel"><h3>Strength / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
@@ -512,7 +516,8 @@ section .lead{margin-left:auto;margin-right:auto}
       <div id="counts-strength" class="muscle-counts"></div></div>
     </div>
     <div id="data-mobility" role="tabpanel" aria-labelledby="tab-mobility" hidden>
-      <div class="panel"><h3>Mobility / recorded training</h3><p class="sub">Mind-and-body FIT categories are a mobility proxy, not proof of a specific mobility exercise or measured range of motion. Original sport labels are retained below.</p>__MOBILITY__</div>
+      <div class="panel"><h3>Mobility / recorded training</h3><p class="sub">Mind-and-body FIT categories are a mobility proxy, not proof of a specific mobility exercise or measured range of motion. Original sport labels are retained below.</p><div class="grid2 discipline-charts"><div><h3>Monthly sessions</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mobility monthly sessions"><svg id="mobilityMonthlyCountChart" viewBox="0 0 560 240" role="img" aria-label="mobility monthly sessions / sessions"></svg></div><p class="sub" id="mobilityMonthlyCountChartNote"></p></div><div><h3>Monthly timer hours</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mobility monthly timer hours"><svg id="mobilityMonthlyHoursChart" viewBox="0 0 560 240" role="img" aria-label="mobility monthly timer hours / h"></svg></div><p class="sub" id="mobilityMonthlyHoursChartNote"></p></div><div><h3>Weekly frequency</h3><div class="chart-scroll" tabindex="0" role="region" aria-label="mobility weekly frequency"><svg id="mobilityWeeklyCountChart" viewBox="0 0 560 240" role="img" aria-label="mobility weekly frequency / sessions"></svg></div><p class="sub" id="mobilityWeeklyCountChartNote"></p></div></div>
+__MOBILITY__</div>
       <div class="panel"><h3>Mobility / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
@@ -638,6 +643,57 @@ const fmtHM = min => `${Math.floor(min/60)}:${String(min%60).padStart(2,'0')}`;
 const monName = ym => new Date(ym+'-02').toLocaleString('en',{month:'long',year:'numeric'});
 const svgEl = (tag,attrs)=>{const e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;};
 
+
+/* ---------- discipline volume: shared zero-based, missing-aware SVG renderer ---------- */
+function disciplineBarChart(id, rows, field, unit, period){
+  const svg=$(id), note=$(id+'Note'); svg.replaceChildren();
+  const title=svgEl('title',{}); title.textContent=svg.getAttribute('aria-label'); svg.append(title);
+  const number=v=>Number(v.toFixed(2)).toLocaleString('en');
+  const values=rows.map(r=>Number.isFinite(r[field]) ? r[field]/(unit==='h'?3600:1) : null);
+  const present=values.filter(v=>v!==null);
+  if(!rows.length || !present.length){note.textContent='No measurements recorded for this chart.';return;}
+  const W=560, left=56, right=18, top=24, bottom=190, step=(W-left-right)/rows.length;
+  const peak=Math.max(...present), magnitude=10**Math.floor(Math.log10(peak||1));
+  const max=peak ? Math.ceil(peak/magnitude)*magnitude : 1;
+  const label=(x,y,text,anchor='middle')=>{const t=svgEl('text',{x,y,'text-anchor':anchor});t.textContent=text;svg.append(t);};
+  for(let i=0;i<=4;i++){
+    const v=max*i/4, y=bottom-(bottom-top)*i/4;
+    svg.append(svgEl('line',{x1:left,y1:y,x2:W-right,y2:y,class:'axis'}));
+    label(left-8,y+4,number(v),'end');
+  }
+  rows.forEach((r,i)=>{
+    const value=values[i], x=left+(i+.5)*step;
+    const coverage=r.recorded && field!=='count' ? ` · ${r.recorded[field]}/${r.count} sessions measured` : '';
+    if(value===null){label(x,bottom-6,'—');}
+    else{
+      const height=value/max*(bottom-top);
+      const bar=svgEl(value===0?'circle':'rect',value===0?{cx:x,cy:bottom,r:2,class:'dot'}:{x:x-Math.min(42,step*.7)/2,y:bottom-height,width:Math.min(42,step*.7),height,class:'bar'});
+      const tt=svgEl('title',{});tt.textContent=`${r.date}${r.start_time?' · '+r.start_time:''}: ${number(value)} ${unit}${coverage}`;bar.append(tt);svg.append(bar);
+      if(step>=65) label(x,bottom-height-7,number(value));
+    }
+    const every=Math.max(1,Math.ceil(rows.length/5));
+    if(i%every===0 || i===rows.length-1 && rows.length%every!==1) label(x,212,r.date.slice(2));
+  });
+  label(left,14,unit,'start');
+  const desc=svgEl('desc',{});desc.textContent=rows.map((r,i)=>`${r.date}: ${values[i]===null?'not recorded':number(values[i])+' '+unit}`).join('; ');svg.append(desc);
+  note.textContent=`${period==='sessions'?'One bar per recorded session':period==='weekly'?'Weeks starting Monday':'Calendar months'} · Europe/Istanbul · ${present.length}/${rows.length} values recorded. `+
+    (period==='sessions'?'Sparse sessions describe this export, not a trend. ':'Only recorded periods shown; gaps are not compressed-time rates. ')+
+    (field==='pace_s_100m'?'Lower is faster; pool and open-water conditions differ.':field==='duration_s'?'Timer time excludes pauses; missing timers excluded.':field==='ascent_m'?'Recorded ascent; partial totals exclude missing measurements.':'Zero means recorded zero; — means missing.');
+}
+function disciplineCharts(){
+  disciplineBarChart('swimDistanceChart', D.disciplines?.swim?.sessions || [], 'km', 'km', 'sessions');
+  disciplineBarChart('swimPaceChart', D.disciplines?.swim?.sessions || [], 'pace_s_100m', 's/100m', 'sessions');
+  disciplineBarChart('mountaineeringDistanceChart', D.disciplines?.mountaineering?.sessions || [], 'km', 'km', 'sessions');
+  disciplineBarChart('mountaineeringAscentChart', D.disciplines?.mountaineering?.sessions || [], 'ascent_m', 'm', 'sessions');
+  disciplineBarChart('mountaineeringMonthlyAscentChart', D.disciplines?.mountaineering?.monthly || [], 'ascent_m', 'm', 'monthly');
+  disciplineBarChart('strengthMonthlyCountChart', D.disciplines?.strength?.monthly || [], 'count', 'sessions', 'monthly');
+  disciplineBarChart('strengthMonthlyHoursChart', D.disciplines?.strength?.monthly || [], 'duration_s', 'h', 'monthly');
+  disciplineBarChart('strengthWeeklyCountChart', D.disciplines?.strength?.weekly || [], 'count', 'sessions', 'weekly');
+  disciplineBarChart('mobilityMonthlyCountChart', D.disciplines?.mobility?.monthly || [], 'count', 'sessions', 'monthly');
+  disciplineBarChart('mobilityMonthlyHoursChart', D.disciplines?.mobility?.monthly || [], 'duration_s', 'h', 'monthly');
+  disciplineBarChart('mobilityWeeklyCountChart', D.disciplines?.mobility?.weekly || [], 'count', 'sessions', 'weekly');
+}
+disciplineCharts();
 
 /* ---------- KPI cards ---------- */
 function kpis(){
