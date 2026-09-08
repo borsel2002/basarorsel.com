@@ -191,14 +191,15 @@ def achievements(data):
         rows.append([label, value, date])
 
     # Running
-    if best.get('k1'): add('Fastest 1 km', f"{best['k1']['s']} s", best['k1']['d'])
-    if best.get('k5'): add('Fastest 5 km', f"{best['k5']['s']} s", best['k5']['d'])
-    if best.get('k10'): add('Fastest 10 km', f"{best['k10']['s']} s", best['k10']['d'])
-    if best.get('hm'): add('Fastest half marathon', f"{best['hm']['s']} s", best['hm']['d'])
+    if best.get('k1'): add('Fastest 1 km', f"{best['k1']['s']} s", ', '.join(best['k1'].get('dates', [best['k1']['d']])))
+    if best.get('k3'): add('Fastest 3 km', f"{best['k3']['s']} s", ', '.join(best['k3'].get('dates', [best['k3']['d']])))
+    if best.get('k5'): add('Fastest 5 km', f"{best['k5']['s']} s", ', '.join(best['k5'].get('dates', [best['k5']['d']])))
+    if best.get('k10'): add('Fastest 10 km', f"{best['k10']['s']} s", ', '.join(best['k10'].get('dates', [best['k10']['d']])))
+    if best.get('hm'): add('Fastest half marathon', f"{best['hm']['s']} s", ', '.join(best['hm'].get('dates', [best['hm']['d']])))
     if prs.get('longest_km'): add('Longest run', f"{prs['longest_km']} km", prs.get('longest_date'))
     if prs.get('biggest_week_km'): add('Biggest running week', f"{prs['biggest_week_km']} km", prs.get('biggest_week'))
     if prs.get('biggest_month_km'): add('Biggest running month', f"{prs['biggest_month_km']} km", prs.get('biggest_month'))
-    if prs.get('max_hr'): add('Highest recorded heart rate', f"{prs['max_hr']} bpm", '—')
+    if prs.get('max_hr'): add('Highest recorded heart rate', f"{prs['max_hr']} bpm", ', '.join(prs.get('max_hr_dates', [])))
 
     # Mountaineering
     m = disc.get('mountaineering', {}).get('bests', {})
@@ -218,9 +219,55 @@ def achievements(data):
     mo = disc.get('mobility', {}).get('bests', {})
     if mo.get('most_sessions_week'): add('Most mobility sessions in a week', f"{mo['most_sessions_week']['value']}", ', '.join(mo['most_sessions_week']['dates']))
 
+    for key, label in [('mountaineering', 'Hike'), ('strength', 'Strength'), ('mobility', 'Mobility')]:
+        b = disc.get(key, {}).get('bests', {}).get('longest_session')
+        if b: add(label + ' longest timer session', receipt_time(b['value']), ', '.join(b['dates']))
+    b = mo.get('most_sessions_month')
+    if b: add('Most mobility sessions in a month', b['value'], ', '.join(b['dates']))
+    mapped = [r for r in data.get('discipline_routes', {}).get('swimming', []) if r['map'] and r['km'] is not None]
+    if mapped:
+        longest = max(r['km'] for r in mapped)
+        add('Longest mapped swim / recorded session distance', f'{longest} km', ', '.join(r['date'] for r in mapped if r['km'] == longest))
     if not rows:
         return '<p class="sub">No recorded bests in this export.</p>'
-    return table(['Achievement', 'Value', 'Date(s)'], rows)
+    return table(['Achievement', 'Value', 'Date(s)'], rows) + '<p class="sub">Rolling split coverage (qualifying windows / runs): ' + '; '.join(f'{escape(k)}: {b.get("recorded", 0)}/{b.get("total", 0)}' for k,b in best.items()) + '. Other field coverage is listed in Data coverage below; discipline tabs include record-specific measured counts.</p>'
+
+
+def evidence_panels(data):
+    coverage = data['coverage']
+    html = '<div class="panel" id="coverage"><h3>Data coverage</h3><p class="sub">Counts describe what the FIT export contains, not what happened outside the watch. Recorded zero values count as present. GPS counts require a usable projected route; indoor routes are excluded. Elevation counts describe retained profiles, not every altitude sample. HR includes summary or record samples.</p>'
+    fields = ['category', 'sessions', 'distance', 'timer', 'ascent', 'hr', 'gps', 'elevation', 'exercise_detail']
+    html += table(['Category', 'Sessions', 'Distance', 'Timer', 'Ascent', 'HR', 'GPS route', 'Elevation profile', 'Exercise detail'], [[r[k] for k in fields] for r in coverage])
+    html += '<p class="sub">Exercise detail counts sessions containing FIT set messages. Routine attribution is separate evidence from routines.md; it does not supply recorded sets, repetitions or load.</p></div>'
+    mix = data['training_mix']; rows = mix['monthly']; cats = mix['categories']
+    colors = ['#167d9a','#a17b31','#7763af','#348578','#af654d','#b14c80','#777777']
+    width = max(720, len(rows)*24); peak = max((sum(r['hours'].values()) for r in rows), default=1) or 1
+    html += '<div class="panel" id="training-mix"><h3>Training mix / monthly timer hours</h3><p class="sub">Europe/Istanbul calendar months. Missing timer fields are excluded; empty months mean no sessions in this export. Hours compare recorded duration, not effort.</p><div class="chart-scroll" tabindex="0" role="region" aria-label="Monthly training mix"><svg role="img" style="width:100%;min-width:'+str(width)+'px" viewBox="0 0 '+str(width)+' 240"><title>Monthly training mix in recorded timer hours; exact values in the table below</title>'
+    for i, row in enumerate(rows):
+        y = 200
+        for cat, color in zip(cats, colors):
+            value = row['hours'][cat]; h = value / peak * 180; y -= h
+            html += f'<rect x="{i*24+4}" y="{y}" width="18" height="{h}" fill="{color}"><title>{row["month"]} {cat}: {value:.3f} h</title></rect>'
+        if i % 6 == 0:
+            html += f'<text x="{i*24+4}" y="225" fill="currentColor" font-size="10">{row["month"]}</text>'
+    html += '</svg></div><p class="sub">' + ' · '.join(f'<span style="color:{color}">{cat}</span>' for cat,color in zip(cats,colors)) + '</p><details><summary>Monthly hours and timer coverage</summary>'
+    html += table(['Month'] + cats + ['Timer / sessions'], [[r['month']] + [number(r['hours'][c]) for c in cats] + [f'{r["recorded"]}/{r["sessions"]}'] for r in rows]) + '</details></div>'
+    for category, routes in data['discipline_routes'].items():
+        if category in ('hiking', 'swimming'): continue
+        mapped = [r for r in routes if r['map']]
+        if not mapped: continue
+        volume = data['route_volume'][category]
+        title = 'Walking / base volume' if category == 'walking' else category.replace('_',' ').title() + ' / routes'
+        html += '<div class="panel"><h3>'+escape(title)+'</h3><p class="sub">'+metric(volume, 'km')+' recorded km · '+metric(volume, 'hours')+' timer hours.</p><p class="sub">'+str(len(mapped))+'/'+str(len(routes))+' sessions have usable GPS. Simplified, projected traces; no basemap, not for navigation. Recorded session distance is not measured from the drawing.</p><details><summary>Browse recorded routes</summary><div class="swim-maps">'
+        for r in mapped:
+            m=r['map']; label=f'{r["date"]} · {number(r["km"])} km'
+            html += '<figure class="swim-map"><figcaption>'+escape(label)+f'</figcaption><svg viewBox="0 0 {m["w"]} {m["h"]}" role="img" aria-label="{escape(label)}">'+''.join('<path d="'+escape(p['d'])+'"/>' for p in m['paths'])+'</svg></figure>'
+        html += '</div></details></div>'
+    rules = data['routine_sources']
+    html += '<div class="panel"><details><summary>Routine sources / routines.md</summary><p class="sub">Historical attribution applies before '+escape(rules['historical_before'])+' in '+escape(rules['timezone'])+'. Exact timestamp logs take precedence over date logs. After the cutoff, unmatched sessions remain unmatched. Historical muscle groups are program attribution, not proof of exercise or biometric load.</p>'
+    html += table(['Routine', 'Category', 'Attributed muscle groups'], [[n,r['category'],', '.join(r['muscles'])] for n,r in rules['routines'].items()])
+    html += table(['Category', 'Historical routine union', 'Historical matches', 'Logged matches', 'Unmatched'], [[c,', '.join(rules['historical'][c]),data['muscle_load'][c]['historical_sessions'],data['muscle_load'][c]['logged_sessions'],data['muscle_load'][c]['unmatched_sessions']] for c in ('strength','mobility')])
+    return html + '</details></div>'
 
 
 def multisport(data):
@@ -259,7 +306,7 @@ def multisport(data):
             '__STRENGTH__': discipline_receipts(disciplines.get('strength'), 'strength'),
             '__MOBILITY__': discipline_receipts(disciplines.get('mobility'), 'mobility'),
             '__SPORTS__': table(['Discipline', 'FIT sport', 'Sub-sports', 'Sessions', 'Hours', 'km', 'Ascent / m'], rows),
-            '__ACHIEVEMENTS__': achievements(data)}
+            '__ACHIEVEMENTS__': achievements(data), '__EVIDENCE__': evidence_panels(data) if 'coverage' in data else ''}
 
 
 def render(data, output):
@@ -305,7 +352,7 @@ def main():
             parser.error('no .fit files found')
         with ProcessPoolExecutor(max_workers=8) as pool:
             parsed = list(pool.map(parse_file, map(str, files)))
-        failures = [item for item in parsed if 'error' in item]
+        failures = [item for item in parsed if 'error' in item or 'start_time' not in item]
         if failures:
             parser.error(f'{len(failures)} FIT files unreadable; refusing silent partial publication')
         data = aggregate(parsed)

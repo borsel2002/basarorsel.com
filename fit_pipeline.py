@@ -33,9 +33,9 @@ SESSION_KEYS = [
 SEMI = 180.0 / 2 ** 31  # FIT semicircles -> degrees
 
 
-SPLIT_TARGETS = {"k1": 1000.0, "k5": 5000.0, "k10": 10000.0, "hm": 21097.5}
+SPLIT_TARGETS = {"k1": 1000.0, "k3": 3000.0, "k5": 5000.0, "k10": 10000.0, "hm": 21097.5}
 # plausibility floor: any window faster than this pace is GPS junk, not sport
-MIN_PACE_S_PER_KM = {"k1": 150, "k5": 165, "k10": 175, "hm": 185}
+MIN_PACE_S_PER_KM = {"k1": 150, "k3": 160, "k5": 165, "k10": 175, "hm": 185}
 
 
 def best_windows(ts, ds):
@@ -164,7 +164,7 @@ def muscle_summary(ws, rules):
     result = {'as_of': end.isoformat(), 'recent_from': start.isoformat(), 'unit':'attributed sessions'}
     for category in ('strength', 'mobility'):
         muscles = sorted({m for r in rules['routines'].values() if r['category']==category for m in r['muscles']})
-        summary = {'all_time':dict.fromkeys(muscles,0), 'recent_28d':dict.fromkeys(muscles,0),
+        summary = {'all_time':dict.fromkeys(muscles,0), 'recent_28d':dict.fromkeys(muscles,0), 'recent_7d':dict.fromkeys(muscles,0),
                    'matched_sessions':0, 'unmatched_sessions':0, 'historical_sessions':0, 'logged_sessions':0}
         for w in ws:
             if sport_category(w) != ('mind_and_body' if category=='mobility' else category):
@@ -187,6 +187,7 @@ def muscle_summary(ws, rules):
             for m in assigned:
                 summary['all_time'][m] += 1
                 if start <= t.date() <= end: summary['recent_28d'][m] += 1
+                if end - datetime.timedelta(days=6) <= t.date() <= end: summary['recent_7d'][m] += 1
         result[category] = summary
     return result
 
@@ -213,7 +214,9 @@ def parse_file(path):
                             spd = frame.get_value("speed", fallback=None)
                     except Exception:
                         continue
-                    if lat is not None and lon is not None:
+                    if hr is not None:
+                        d["record_hr"] = True
+                    if lat is not None and lon is not None and -90 <= lat * SEMI <= 90 and -180 <= lon * SEMI <= 180 and (lat, lon) != (0, 0):
                         pts.append((lat * SEMI, lon * SEMI))
                         if t is not None:
                             gps_records.append((lat * SEMI, lon * SEMI, t.timestamp(), spd))
@@ -228,6 +231,8 @@ def parse_file(path):
                         hrs.append(hr or 0)
                         spds.append(spd or 0)
                         alts.append(alt)
+                elif frame.name == "set":
+                    d["exercise_detail_count"] = d.get("exercise_detail_count", 0) + 1
                 elif frame.name == "session" and "sport" not in d:
                     for f in frame.fields:
                         if f.name in SESSION_KEYS and f.value is not None:
@@ -517,6 +522,53 @@ def discipline_summary(ws):
     return out
 
 
+def evidence_summary(ws):
+    """Coverage counts refer to export evidence, including recorded zero values."""
+    from zoneinfo import ZoneInfo
+    grouped = collections.defaultdict(list)
+    for w in ws:
+        grouped[sport_category(w)].append(w)
+    routes, coverage = {}, []
+    for category, items in sorted(grouped.items()):
+        rows = swim_routes(items) if category == 'swimming' else hike_routes(items)
+        for w, row in zip(items, rows):
+            if str(w.get('sub_sport', '')) in ('indoor', 'indoor_running', 'treadmill', 'indoor_cycling', 'lap_swimming'):
+                row.update(map=None, status='Indoor session; route not displayed')
+        if category != 'running':
+            routes[category] = rows
+        coverage.append(dict(category=category, sessions=len(items),
+            distance=sum(w.get('total_distance') is not None for w in items),
+            timer=sum(w.get('total_timer_time') is not None for w in items),
+            ascent=sum(w.get('total_ascent') is not None for w in items),
+            hr=sum(any(w.get(k) is not None for k in ('avg_heart_rate', 'max_heart_rate')) or w.get('record_hr', False) for w in items),
+            gps=sum(r['map'] is not None for r in rows),
+            elevation=sum(bool(w.get('elev')) for w in items),
+            exercise_detail=sum(w.get('exercise_detail_count', 0) > 0 for w in items)))
+    categories = ['running', 'walking', 'hiking', 'swimming', 'strength', 'mobility', 'other']
+    months = {}
+    for w in ws:
+        month = dt(w).astimezone(ZoneInfo('Europe/Istanbul')).strftime('%Y-%m')
+        row = months.setdefault(month, dict(month=month, hours=dict.fromkeys(categories, 0), recorded=0, sessions=0))
+        row['sessions'] += 1
+        category = sport_category(w)
+        category = 'mobility' if category == 'mind_and_body' else category
+        category = category if category in categories else 'other'
+        if w.get('total_timer_time') is not None:
+            row['hours'][category] += w['total_timer_time'] / 3600
+            row['recorded'] += 1
+    if months:
+        current = datetime.date.fromisoformat(min(months) + '-01')
+        end = max(months)
+        while current.strftime('%Y-%m') <= end:
+            key = current.strftime('%Y-%m')
+            months.setdefault(key, dict(month=key, hours=dict.fromkeys(categories, 0), recorded=0, sessions=0))
+            current = (current.replace(day=28) + datetime.timedelta(days=4)).replace(day=1)
+    return dict(coverage=coverage, discipline_routes=routes,
+                route_volume={k: sport_summary(v) for k,v in grouped.items() if k != 'running'},
+                training_mix=dict(unit='recorded timer hours', timezone='Europe/Istanbul', categories=categories,
+                                  monthly=[months[k] for k in sorted(months)]))
+
+
 def aggregate(parsed):
     # Dedupe: the same workout often exists from several sync apps.
     # Same start_time + sport -> keep the record with the most fields.
@@ -598,6 +650,7 @@ def aggregate(parsed):
         "biggest_week_km": round(big_wk[1], 1), "biggest_week": f"{big_wk[0][0]}-W{big_wk[0][1]:02d}",
         "biggest_month_km": big_mon["km"], "biggest_month": big_mon["m"],
         "max_hr": max((w.get("max_heart_rate", 0) for w in runs), default=0),
+        "max_hr_dates": [dt(w).date().isoformat() for w in runs if w.get("max_heart_rate") == max((r.get("max_heart_rate", 0) for r in runs), default=0)],
     }
     if r5:
         f5 = min(r5, key=pace)
@@ -642,7 +695,13 @@ def aggregate(parsed):
     for w in runs:
         for k, sec in (w.get("best") or {}).items():
             if k not in best or sec < best[k]["s"]:
-                best[k] = {"s": sec, "d": dt(w).strftime("%Y-%m-%d")}
+                best[k] = {"s": sec, "d": dt(w).strftime("%Y-%m-%d"), "dates": [dt(w).strftime("%Y-%m-%d")]}
+            elif sec == best[k]["s"]:
+                best[k]["dates"].append(dt(w).strftime("%Y-%m-%d"))
+
+    for k, value in best.items():
+        value["recorded"] = sum(k in (w.get("best") or {}) for w in runs)
+        value["total"] = len(runs)
 
     # aerobic decoupling per qualifying run (≥40 min with HR)
     dec_pts = [{"d": dt(w).strftime("%Y-%m-%d"), "v": w["dec"],
@@ -684,6 +743,8 @@ def aggregate(parsed):
             gap = {"days": (b - a).days, "from": a.isoformat(), "to": b.isoformat()}
 
     return {
+        **evidence_summary(ws),
+        "routine_sources": load_routine_rules(),
         "generated": datetime.date.today().isoformat(),
         "meta": {"files": len(parsed), "unique": len(ws)},
         "sports": sports,

@@ -250,7 +250,7 @@ section .lead{margin-left:auto;margin-right:auto}
     <div class="role">portfolio · training data · projects · code</div>
     <p class="lead" style="margin-top:28px">The training I logged.<br>The things I built.<br>The source behind both.</p>
     <p style="margin-top:22px">The person is at <a href="https://basarorsel.me">basarorsel.me</a>. This is the working record: measured sessions, public projects, and code you can inspect.</p>
-    <div class="hero-actions mono"><a href="#data">Open training data →</a><a href="#builder">See projects →</a></div>
+    <div class="hero-actions mono"><a href="#data">Open training data →</a><a href="https://basarorsel.me">Meet the person →</a></div>
     <div class="statstrip" id="heroStats"></div>
     <div class="qed" id="fresh"></div>
   </div>
@@ -276,11 +276,7 @@ section .lead{margin-left:auto;margin-right:auto}
       __SPORTS__
       <p class="goalnote">Hours use recorded timer time. Distance and ascent are sums of recorded fields only; — means unrecorded, not zero. Partial sums show their session coverage. Indoor zero distances are export values, not inferred travel. Display precision is not sensor accuracy.</p>
     </div>
-    <div class="panel" id="achievements">
-      <h4>Recorded bests / achievements</h4>
-      <p class="sub">Every number below is computed from this FIT export, not typed by hand. "Recorded" means the watch captured it; it is not a certified race result. Ties list every date.</p>
-      __ACHIEVEMENTS__
-    </div>
+    <p><a href="#data" data-records-link>Records / all disciplines →</a></p>
     <div class="qed"><a href="#data">Read the full training log →</a></div>
   </div>
 </section>
@@ -296,7 +292,14 @@ section .lead{margin-left:auto;margin-right:auto}
       <button id="tab-triathlon" role="tab" aria-controls="data-triathlon" aria-selected="false" tabindex="-1" data-tab="triathlon">Triathlon</button>
       <button id="tab-strength" role="tab" aria-controls="data-strength" aria-selected="false" tabindex="-1" data-tab="strength">Strength</button>
       <button id="tab-mobility" role="tab" aria-controls="data-mobility" aria-selected="false" tabindex="-1" data-tab="mobility">Mobility</button>
+      <button id="tab-records" role="tab" aria-controls="data-records" aria-selected="false" tabindex="-1" data-tab="records">Records</button>
     </div>
+    <div id="data-records" role="tabpanel" aria-labelledby="tab-records" hidden>    <div class="panel" id="achievements">
+      <h4>Recorded bests / achievements</h4>
+      <p class="sub">Every number below is computed from this FIT export, not typed by hand. "Recorded" means the watch captured it; it is not a certified race result. Ties list every date.</p>
+      __ACHIEVEMENTS__
+    </div>
+<p class="sub">Running splits are sampled rolling elapsed-time windows with plausibility filters, not certified race PBs. Running totals use recorded distance; highest HR uses session maxima. Discipline records exclude missing fields; measured counts and tied dates are detailed in each discipline tab. Longest time on feet uses timer time, excluding pauses. Swim pace uses paired positive timer and distance; conditions differ.</p></div>
     <div id="data-running" role="tabpanel" aria-labelledby="tab-running">
     <div class="qed" id="gateHint"></div>
     <div class="method-note"><b>Read the limits.</b> Rolling splits are GPS-derived, not certified race results. Heart-rate load is a model, not a fitness test. Missing logs are not proof of inactivity. <a href="#methodology" id="methodLink">Methods &amp; source ↓</a></div>
@@ -389,7 +392,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <div class="panel"><h3>Strength / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
-      <label>Window <select id="window-strength" aria-label="Strength heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
+      <label>Window <select id="window-strength" aria-label="Strength heatmap window"><option value="all_time">All recorded time</option><option value="recent_7d">Recent 7 days of snapshot</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
       <p id="summary-strength" class="sub"></p><svg id="muscles-strength" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Strength inferred muscle heatmap"></svg>
       <p class="sub">Schematic body model, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
       <div id="counts-strength" class="muscle-counts"></div></div>
@@ -399,16 +402,17 @@ section .lead{margin-left:auto;margin-right:auto}
       <div class="panel"><h3>Mobility / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
-      <label>Window <select id="window-mobility" aria-label="Mobility heatmap window"><option value="all_time">All recorded time</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
+      <label>Window <select id="window-mobility" aria-label="Mobility heatmap window"><option value="all_time">All recorded time</option><option value="recent_7d">Recent 7 days of snapshot</option><option value="recent_28d">Recent 28 days of snapshot</option></select></label>
       <p id="summary-mobility" class="sub"></p><svg id="muscles-mobility" class="muscle-map" viewBox="0 0 640 540" role="img" aria-label="Mobility inferred muscle heatmap"></svg>
       <p class="sub">Schematic body model, not anatomical segmentation. Pale = fewer sessions; solid = the largest count in this view. Outlined = no attributed sessions.</p>
       <div id="counts-mobility" class="muscle-counts"></div></div>
     </div>
+    __EVIDENCE__
     <details id="methodology" class="panel methods">
       <summary>Methods, limitations &amp; source</summary>
       <div id="provenance" class="sub"></div>
       <p>Session summaries supply distance and timer time. Duplicate start-time/sport records are removed. Distance totals reconcile against monthly and weekly sums, within rounding tolerance. Weeks without a recorded run remain visible.</p>
-      <p>Best splits use a rolling distance window with interpolation through record frames. They are not race results. Route drawings use simplified, projected GPS traces; they omit a basemap and are not for navigation. Only location clusters are drawn; other traces are counted separately.</p>
+      <p>Best splits use a rolling distance window between sampled record frames. They are not race results. Route drawings use simplified, projected GPS traces; they omit a basemap and are not for navigation. Only location clusters are drawn; other traces are counted separately.</p>
       <p>Banister TRIMP uses average heart rate, the highest recorded HR and an explicitly assumed resting HR. The load curves are exponentially weighted averages, initialized at zero. They are not measured fitness or a prescription. The form value is chronic minus acute load.</p>
       <p>Decoupling compares speed/HR between halves, after excluding the warm-up and filtering movement records. Quarterly averages combine different routes, conditions and intensities; pace and HR have separate scales. Elevation is watch-derived and can contain altitude error. Calories are watch estimates.</p>
       <p>Targets in Athlete are goals, not telemetry. The current-state description is self-reported. This snapshot does not establish readiness for selection.</p>
@@ -451,7 +455,7 @@ section .lead{margin-left:auto;margin-right:auto}
     <h2>Three sites. Different jobs.</h2>
     <div class="cards cards-3">
       <a class="card" href="https://basarorsel.me"><div class="n">Identity</div><h3>basarorsel.me</h3><p>The person: mathematics, sport, current direction and contact.</p><div class="sig">meet the person →</div></a>
-      <a class="card" href="#builder"><div class="n">Portfolio / you are here</div><h3>basarorsel.com</h3><p>Training data, finished projects and public source code.</p><div class="sig">see the projects →</div></a>
+      <a class="card" href="#builder"><div class="n">Portfolio / you are here</div><h3>basarorsel.com</h3><p>The evidence layer: training data, finished projects and public source code.</p><div class="sig">see the projects →</div></a>
       <a class="card" href="https://orselstudio.tech"><div class="n">Work / Orsel Studio</div><h3>orselstudio.tech</h3><p>WooCommerce, AI/search optimization and complete websites. Business belongs there, not in the training log.</p><div class="sig">talk about work →</div></a>
     </div>
   </div>
@@ -744,6 +748,7 @@ tabs.forEach((b,i)=>{
     if(n!==null){e.preventDefault();selectDataTab(tabs[n],true);}
   });
 });
+document.querySelectorAll('[data-records-link]').forEach(a=>a.addEventListener('click',()=>selectDataTab($('tab-records'),true)));
 document.querySelectorAll('[data-running-link]').forEach(a=>a.addEventListener('click',()=>selectDataTab($('tab-running'),true)));
 function muscleMap(category){
   const load=D.muscle_load[category], window=$('window-'+category).value, counts=load[window];
@@ -793,7 +798,7 @@ function muscleMap(category){
     });
     svg.append(figure);
   });
-  $('summary-'+category).textContent=`${load.matched_sessions} attributed sessions (${load.historical_sessions} historical, ${load.logged_sessions} logged); ${load.unmatched_sessions} unmatched. Recent window: ${D.muscle_load.recent_from}–${D.muscle_load.as_of}, relative to the latest workout, not today.`;
+  $('summary-'+category).textContent=`${load.matched_sessions} attributed sessions (${load.historical_sessions} historical, ${load.logged_sessions} logged); ${load.unmatched_sessions} unmatched. Window: ${window}; ending ${D.muscle_load.as_of}, relative to the latest workout, not today.`;
   const target=$('counts-'+category);target.replaceChildren();
   Object.entries(counts).forEach(([name,n])=>{const span=document.createElement('span');span.textContent=`${name}: ${n}`;target.append(span);});
 }
