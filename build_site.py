@@ -275,9 +275,19 @@ def render(data, output):
         assert html.count(token) == 1
         html = html.replace(token, content)
     # Inline brand assets: the resulting page works alone, even from file://.
-    for asset in ('signature.svg', 'logo.svg', 'brand-logo-light.svg', 'brand-logo-dark.svg'):
-        uri = 'data:image/svg+xml;base64,' + base64.b64encode((HERE/asset).read_bytes()).decode()
-        html = html.replace(f'"{asset}"', f'"{uri}"')
+    asset_mime = {
+        'signature.svg': 'image/svg+xml',
+        'logo.svg': 'image/svg+xml',
+        'brand-logo-light.svg': 'image/svg+xml',
+        'brand-logo-dark.svg': 'image/svg+xml',
+        'favicon.svg': 'image/svg+xml',
+        'favicon.ico': 'image/x-icon',
+    }
+    for asset, mime in asset_mime.items():
+        path = HERE / asset
+        if path.exists():
+            uri = f'data:{mime};base64,' + base64.b64encode(path.read_bytes()).decode()
+            html = html.replace(f'"{asset}"', f'"{uri}"')
     output.write_text(html)
     print(f"Built {output.name}: {data['totals']['workouts']} workouts, {data['totals']['run_km']} run km, {data['totals']['hours']} h; {len(html.encode()):,} bytes")
 
