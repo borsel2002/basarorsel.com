@@ -108,7 +108,7 @@ def discipline_receipts(summary, kind):
     html += '<p class="sub">Dates and calendar periods: Europe/Istanbul. Durations are timer time, excluding pauses. Partial totals identify measurement coverage.</p>'
     if kind == 'swim':
         html += f'<p class="sub">Distance-weighted pace uses paired positive distance and timer time: {summary["pace_recorded"]}/{summary["count"]} sessions. Pool and open-water conditions are not equivalent; this is whole-session pace, not a fastest split.</p>'
-    html += '<h4>Recorded bests</h4><p class="sub">Bests in this export, not current fitness or certified results. All tied dates are listed. Missing measurements are excluded; partial-day ascent is a recorded sum.</p>'
+    html += '<h3>Recorded bests</h3><p class="sub">Bests in this export, not current fitness or certified results. All tied dates are listed. Missing measurements are excluded; partial-day ascent is a recorded sum.</p>'
     specs = [('longest_session', 'Longest session', receipt_time)]
     if endurance:
         specs.append(('longest_distance', 'Longest hike / km' if kind == 'mountaineering' else 'Longest swim / km', receipt_number))
@@ -125,7 +125,7 @@ def discipline_receipts(summary, kind):
                           (', '.join(b['dates']) + ''.join(f' [{c["date"]}: {c["recorded"]}/{c["total"]} sessions measured]' for c in b.get('winning_coverage', []))) if b else 'No data recorded',
                           f'{b["recorded"]}/{b["total"]}' if b else 'No data recorded'])
     html += table(['Best', 'Value', 'Date / period (all ties)', 'Measured / eligible'], best_rows)
-    html += '<h4>Training over time</h4>'
+    html += '<h3>Training over time</h3>'
     if kind == 'mountaineering':
         html += receipt_chart(summary['sessions'], 'ascent_m', 'Per-session ascent / m')
     else:
@@ -133,7 +133,7 @@ def discipline_receipts(summary, kind):
     html += table(['Month', 'Sessions', 'Timer hours (coverage)'], [
         [r['date'], r['count'], receipt_number(r['duration_s'] / 3600 if r['duration_s'] is not None else None) + f' ({r["recorded"]["duration_s"]}/{r["count"]} recorded)']
         for r in summary['monthly']])
-    html += '<h4>Session receipts</h4>'
+    html += '<h3>Session receipts</h3>'
     headers = ['Date', 'FIT sport', 'FIT sub-sport', 'Timer / h:mm:ss']
     if endurance:
         headers += ['km', 'Ascent / m' if kind == 'mountaineering' else 'Pace / min:sec per 100 m']
@@ -146,7 +146,7 @@ def discipline_receipts(summary, kind):
     return html + (table(headers, rows) if rows else '<p>No data recorded for this discipline.</p>')
 
 def hike_maps_and_profiles(data):
-    html = '<h4>Hike maps / recorded GPS</h4><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Sessions without GPS say "no GPS trace recorded".</p><div class="swim-maps">'
+    html = '<h3>Hike maps / recorded GPS</h3><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Sessions without GPS say "no GPS trace recorded".</p><div class="swim-maps">'
     if not data.get('hike_routes'):
         html += '<p class="sub">No hike GPS data recorded.</p>'
     for session in data.get('hike_routes', []):
@@ -162,7 +162,7 @@ def hike_maps_and_profiles(data):
     html += '</div>'
     profiles = data.get('hike_profiles', [])
     if profiles:
-        html += '<h4>Hike elevation profiles</h4><p class="sub">Watch-derived altitude by distance; can contain GPS altitude error.</p><div id="hikeElevProfiles">'
+        html += '<h3>Hike elevation profiles</h3><p class="sub">Watch-derived altitude by distance; can contain GPS altitude error.</p><div id="hikeElevProfiles">'
         for h in profiles:
             if not h.get('elev') or len(h['elev']) < 2:
                 continue
@@ -275,8 +275,8 @@ def multisport(data):
     swim = discipline_receipts(disciplines.get('swim'), 'swim') if disciplines else discipline_log(data['swim'])
     combined = disciplines.get('swim_run')
     if combined:
-        swim = '<h4>Combined swim + run volume</h4>' + table(['Sessions', 'Recorded km', 'Timer hours'], [[combined['count'], receipt_metric(combined, 'km'), receipt_metric(combined, 'hours')]]) + '<p class="sub">Distance is a sum across disciplines, not an equivalent training load or an event result.</p>' + swim
-    swim += '<h4>Swim map / recorded GPS</h4><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Swim type comes from FIT metadata, not the shape of a trace. Sessions without GPS say “no GPS trace recorded”; pool GPS is not plotted.</p><div class="swim-maps">'
+        swim = '<h3>Combined swim + run volume</h3>' + table(['Sessions', 'Recorded km', 'Timer hours'], [[combined['count'], receipt_metric(combined, 'km'), receipt_metric(combined, 'hours')]]) + '<p class="sub">Distance is a sum across disciplines, not an equivalent training load or an event result.</p>' + swim
+    swim += '<h3>Swim map / recorded GPS</h3><p class="sub">Simplified, projected GPS traces; no basemap, not for navigation. Swim type comes from FIT metadata, not the shape of a trace. Sessions without GPS say “no GPS trace recorded”; pool GPS is not plotted.</p><div class="swim-maps">'
     if not data.get('swim_routes'):
         swim += '<p class="sub">No swim GPS data recorded.</p>'
     for session in data.get('swim_routes', []):

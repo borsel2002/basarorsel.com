@@ -3,15 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Başar Örsel — training data, projects &amp; code</title>
-<meta name="description" content="The working record of Başar Örsel: training telemetry from FIT files, finished projects and public source code. A hand-coded portfolio.">
-<link rel="canonical" href="https://basarorsel.com/">
-<meta property="og:title" content="Başar Örsel — portfolio">
-<meta property="og:description" content="Training data, finished projects and the source behind both.">
-<meta property="og:url" content="https://basarorsel.com/">
-<meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.ico">
+<title>Başar Örsel — Orienteer, Training Data &amp; Projects</title>
+<meta name="description" content="Başar Örsel, former Turkish national orienteer and İYTE mathematics student in İzmir: self-recorded training data, mountaineering, swimming and code projects.">
+<link rel="canonical" href="https://basarorsel.com/">
+<meta name="robots" content="index, follow">
+<link rel="sitemap" type="application/xml" href="https://basarorsel.com/sitemap.xml">
+<meta property="og:title" content="Başar Örsel — Orienteer, Training Data &amp; Projects">
+<meta property="og:description" content="Başar Örsel, former Turkish national orienteer and İYTE mathematics student in İzmir: self-recorded training data, mountaineering, swimming and code projects.">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://basarorsel.com/">
+<meta property="og:image" content="https://basarorsel.com/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Başar Örsel signature on a white background">
+<meta property="og:site_name" content="Başar Örsel — Training &amp; Projects">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Başar Örsel — Orienteer, Training Data &amp; Projects">
+<meta name="twitter:description" content="Başar Örsel, former Turkish national orienteer and İYTE mathematics student in İzmir: self-recorded training data, mountaineering, swimming and code projects.">
+<meta name="twitter:image" content="https://basarorsel.com/social-card.png">
+<meta name="twitter:image:alt" content="Başar Örsel signature on a white background">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://basarorsel.me/#person",
+      "name": "Başar Örsel",
+      "alternateName": "Basar Orsel",
+      "url": "https://basarorsel.me/",
+      "image": "https://basarorsel.me/signature.svg",
+      "jobTitle": "Developer",
+      "description": "Mathematics student at İzmir Institute of Technology (İYTE), former national orienteer for Turkey, rebuilding toward E21E in 2027. Developer of basarorsel.com, basarorsel.me and Orsel Studio.",
+      "nationality": {
+        "@type": "Country",
+        "name": "Turkey"
+      },
+      "knowsAbout": [
+        "Orienteering",
+        "Mountaineering",
+        "Triathlon",
+        "Swimming",
+        "Running",
+        "Strength training",
+        "Mobility training",
+        "Mathematics",
+        "Software development"
+      ],
+      "sameAs": [
+        "https://github.com/borsel2002",
+        "https://basarorsel.com/",
+        "https://basarorsel.me/"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "İzmir",
+        "addressCountry": "TR"
+      },
+      "affiliation": {
+        "@type": "CollegeOrUniversity",
+        "name": "İzmir Institute of Technology",
+        "alternateName": "İYTE"
+      },
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Mathematics student"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://basarorsel.com/#website",
+      "name": "Başar Örsel — Orienteer, Training Data & Projects",
+      "url": "https://basarorsel.com/",
+      "description": "Başar Örsel, former Turkish national orienteer and İYTE mathematics student in İzmir: self-recorded training data, mountaineering, swimming and code projects.",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://basarorsel.me/#person"
+      }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://basarorsel.com/#profile",
+      "url": "https://basarorsel.com/",
+      "name": "Başar Örsel — Orienteer, Training Data & Projects",
+      "description": "Başar Örsel, former Turkish national orienteer and İYTE mathematics student in İzmir: self-recorded training data, mountaineering, swimming and code projects.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://basarorsel.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://basarorsel.me/#person"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://basarorsel.com/#training-dataset",
+      "name": "Başar Örsel — self-recorded training data",
+      "description": "Self-recorded training data aggregated from personal HealthFit FIT exports. Training summaries are not independently verified achievements; raw FIT files remain local.",
+      "url": "https://basarorsel.com/#data",
+      "creator": {
+        "@id": "https://basarorsel.me/#person"
+      },
+      "isPartOf": {
+        "@id": "https://basarorsel.com/#website"
+      },
+      "distribution": {
+        "@type": "DataDownload",
+        "contentUrl": "https://basarorsel.com/data.json",
+        "encodingFormat": "application/json"
+      }
+    }
+  ]
+}
+</script>
 <style>
 /* ---------- base: white is the day, black is the night ---------- */
 :root{
@@ -119,7 +226,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-size:11.5px;color:va
 #dash{display:none}
 #dash.open{display:block}
 .panel{background:var(--card);border:1px solid var(--line);padding:26px;margin-bottom:22px;border-radius:2px}
-.panel h4{font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.panel h3{font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
 .panel .sub{font-size:12px;color:var(--mut);margin-bottom:18px;font-family:ui-monospace,Menlo,monospace}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 @media(max-width:820px){.grid2{grid-template-columns:1fr}}
@@ -221,11 +328,11 @@ section .lead{margin-left:auto;margin-right:auto}
 <noscript><style>section{display:block !important}.menu-btn,#themeBtn{display:none}.links{display:flex;position:static}.hero{min-height:auto}[role=tabpanel]{display:block !important}.data-tabs{display:none}</style></noscript>
 </head><body>
 <a class="skip-link" href="#data">Skip to training data</a>
-<nav>
+<nav aria-label="Primary navigation">
   <div class="wrap">
     <a class="brand" href="#" aria-label="Başar Örsel home">
-      <img class="brand-logo brand-logo-light" src="brand-logo-light.svg" alt="" aria-hidden="true">
-      <img class="brand-logo brand-logo-dark" src="brand-logo-dark.svg" alt="" aria-hidden="true">
+      <img class="brand-logo brand-logo-light" src="brand-logo-light.svg" alt="Başar Örsel monogram logo">
+      <img class="brand-logo brand-logo-dark" src="brand-logo-dark.svg" alt="Başar Örsel monogram logo">
       <span>BAŞAR&nbsp;ÖRSEL</span>
     </a>
     <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">
@@ -238,15 +345,15 @@ section .lead{margin-left:auto;margin-right:auto}
       <a href="#identity">Identity</a>
       <a href="#contact">Contact</a>
       <a href="https://basarorsel.me" style="color:var(--accent)">Person ↗</a>
-      <button id="themeBtn" title="Theme: auto follows the sun — white is the day, black is the night">AUTO</button>
+      <button id="themeBtn" aria-label="Change color theme" title="Theme: auto follows the sun — white is the day, black is the night">AUTO</button>
     </div>
   </div>
 </nav>
 <main>
 <header class="hero" id="home">
   <div class="wrap">
-    <h1 class="sr-only">Başar Örsel — portfolio</h1>
-    <img class="signature-name" src="signature.svg" alt="Başar Örsel">
+    <h1 class="sr-only">Başar Örsel — mathematics student, orienteer and developer</h1>
+    <img class="signature-name" src="signature.svg" alt="Başar Örsel handwritten signature">
     <div class="role">portfolio · training data · projects · code</div>
     <p class="lead" style="margin-top:28px">The training I logged.<br>The things I built.<br>The source behind both.</p>
     <p style="margin-top:22px">The person is at <a href="https://basarorsel.me">basarorsel.me</a>. This is the working record: measured sessions, public projects, and code you can inspect.</p>
@@ -259,6 +366,7 @@ section .lead{margin-left:auto;margin-right:auto}
   <div class="wrap">
     <span class="label">01 — Athlete</span>
     <h2>Returning to competition.</h2>
+    <p>Başar Örsel (Basar Orsel) is a mathematics student at İzmir Institute of Technology (İYTE) in İzmir, Turkey, a former national orienteer for Turkey, and the developer of basarorsel.com, basarorsel.me and Orsel Studio. He is rebuilding toward E21E in 2027, with mountaineering, swimming, running, strength and mobility training.</p>
     <div class="cols">
       <div><p>Former national orienteer for Turkey. Rebuilding toward the senior-elite men's team, E21E, in 2027.</p><p>Current state: detrained. Previous selection is history, not evidence of current fitness. The work now is restoring running capacity and bringing it back to the map.</p></div>
       <div><p>The running gate is 3000 m under 10:00. It is a target, not an achieved result or a guarantee of selection.</p><p>The log below shows what the watch recorded. It cannot tell you how cleanly I navigated or whether I am ready to race.</p><p>Mountaineering adds time on feet and ascent. Triathlon-oriented training currently means swim + run: no cycling data exists in this export. Strength and mobility are load-bearing structures supporting the endurance work, not afterthoughts.</p><p class="sig">orienteering · mountaineering · swim + run · strength · mobility</p></div>
@@ -271,7 +379,7 @@ section .lead{margin-left:auto;margin-right:auto}
     </div>
     <p class="goalnote">Historical bests do not describe today's fitness. <span id="sportsDate"></span></p>
     <div class="panel" id="sportsTable">
-      <h4>Full training mix / every discipline</h4>
+      <h3>Full training mix / every discipline</h3>
       <p class="sub">Deduplicated sessions, grouped by FIT sport and display category. Unrecognized sports stay visible. Sub-sports retain the export's labels.</p>
       __SPORTS__
       <p class="goalnote">Hours use recorded timer time. Distance and ascent are sums of recorded fields only; — means unrecorded, not zero. Partial sums show their session coverage. Indoor zero distances are export values, not inferred travel. Display precision is not sensor accuracy.</p>
@@ -296,7 +404,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <button id="tab-records" role="tab" aria-controls="data-records" aria-selected="false" tabindex="-1" data-tab="records">Records</button>
     </div>
     <div id="data-records" role="tabpanel" aria-labelledby="tab-records" hidden>    <div class="panel" id="achievements">
-      <h4>Recorded bests / achievements</h4>
+      <h3>Recorded bests / achievements</h3>
       <p class="sub">Every number below is computed from this FIT export, not typed by hand. "Recorded" means the watch captured it; it is not a certified race result. Ties list every date.</p>
       __ACHIEVEMENTS__
     </div>
@@ -313,45 +421,45 @@ section .lead{margin-left:auto;margin-right:auto}
       <div class="kpis" id="kpis"></div>
 
       <div class="panel">
-        <h4>Monthly running volume</h4>
+        <h3>Monthly running volume</h3>
         <div class="sub" id="monSub"></div>
         <div class="chart-scroll" tabindex="0" role="region" aria-label="Scrollable chart"><svg id="monChart" width="100%" height="220" viewBox="0 0 980 220" preserveAspectRatio="none"></svg></div>
       </div>
 
       <div class="grid2">
         <div class="panel">
-          <h4>Weekly volume</h4>
+          <h3>Weekly volume</h3>
           <div class="sub">km per ISO week, zero weeks included — gaps stay visible</div>
           <svg id="wkChart" width="100%" height="190" viewBox="0 0 470 190" preserveAspectRatio="none"></svg>
         </div>
         <div class="panel">
-          <h4>Aerobic efficiency</h4>
+          <h3>Aerobic efficiency</h3>
           <div class="sub">quarterly means · pace (min/km, solid) / HR (bpm, dashed) · independent scales; not a controlled test</div>
           <svg id="effChart" width="100%" height="190" viewBox="0 0 470 190" preserveAspectRatio="none"></svg>
         </div>
       </div>
 
       <div class="panel">
-        <h4>Recorded runs</h4>
+        <h3>Recorded runs</h3>
         <div class="sub">runs &gt;500 m and pace &lt;12 min/km · distance (x) / pace (y) · opacity = recency</div>
         <div class="chart-scroll" tabindex="0" role="region" aria-label="Scrollable chart"><svg id="runScatter" width="100%" height="240" viewBox="0 0 980 240" preserveAspectRatio="none"></svg></div>
       </div>
 
       <div class="grid2">
         <div class="panel" id="loadPanel">
-          <h4>Fitness · fatigue · form</h4>
+          <h3>Fitness · fatigue · form</h3>
           <div class="sub" id="loadSub"></div>
           <svg id="loadChart" width="100%" height="200" viewBox="0 0 470 200" preserveAspectRatio="none"></svg>
         </div>
         <div class="panel" id="decPanel">
-          <h4>Aerobic decoupling</h4>
+          <h3>Aerobic decoupling</h3>
           <div class="sub">speed/HR change between halves · qualifying runs ≥40 min · +5% reference, not a diagnosis</div>
           <svg id="decChart" width="100%" height="200" viewBox="0 0 470 200" preserveAspectRatio="none"></svg>
         </div>
       </div>
 
       <div class="panel" id="routesPanel">
-        <h4>The territory</h4>
+        <h3>The territory</h3>
         <div class="sub" id="routesSub"></div>
         <p class="sub">Outlined break-point markers indicate likely stops / break points: speed below 0.5 m/s for more than 120 seconds. GPS gaps over 30 seconds are excluded; slow movement and GPS error can still look like stops.</p>
         <div id="routeMaps"></div>
@@ -359,13 +467,13 @@ section .lead{margin-left:auto;margin-right:auto}
 
       <div class="grid2">
         <div class="panel">
-          <h4>Long runs — half marathon and beyond</h4>
+          <h3>Long runs — half marathon and beyond</h3>
           <div class="sub" id="hmSub"></div>
           <div class="table-scroll" tabindex="0" role="region" aria-label="Long runs table"><table id="hmTable"></table></div>
           <div id="elevProfiles"></div>
         </div>
         <div class="panel">
-          <h4>Records &amp; structure</h4>
+          <h3>Records &amp; structure</h3>
           <div class="sub">Running personal bests · fastest recorded rolling splits and support work · not race-certified or current fitness</div>
           <div class="table-scroll" tabindex="0" role="region" aria-label="Records table"><table id="prTable"></table></div>
           <div class="truth" id="truthNote"></div>
@@ -376,19 +484,19 @@ section .lead{margin-left:auto;margin-right:auto}
     </div>
     <div id="data-swimming" role="tabpanel" aria-labelledby="tab-swimming" hidden>
     <div class="panel" id="swimPanel">
-      <h4>Swimming / recorded training</h4>
+      <h3>Swimming / recorded training</h3>
       <p class="sub">Swim training alongside the running record; these totals do not establish a completed triathlon.</p>
       __SWIM__
     </div>
     </div>
     <div id="data-cycling" role="tabpanel" aria-labelledby="tab-cycling" hidden>
       <div class="panel" id="cyclingPanel">
-        <h4>Cycling / export coverage</h4>
+        <h3>Cycling / export coverage</h3>
         __CYCLING__
       </div>
     </div>
     <div id="data-mountaineering" role="tabpanel" aria-labelledby="tab-mountaineering" hidden>    <div class="panel" id="hikingPanel">
-      <h4>Mountaineering / hiking</h4>
+      <h3>Mountaineering / hiking</h3>
       <p class="sub">Mountaineering is inferred from FIT hiking and recorded ascent, not a distinct mountaineering sport. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
       __HIKING__
     </div>
@@ -478,7 +586,7 @@ section .lead{margin-left:auto;margin-right:auto}
   </div>
 </section>
 
-<footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:0 24px"><span>BAŞAR ÖRSEL · hand-coded · no frameworks or trackers</span><span id="genStamp"></span><span>the person → <a href="https://basarorsel.me">basarorsel.me</a> · white is the day · black is the night</span></div></footer>
+<footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:0 24px"><span>BAŞAR ÖRSEL · hand-coded · no frameworks or trackers</span><span id="genStamp"></span><span>the person → <a href="https://basarorsel.me">Başar Örsel — personal identity</a> · white is the day · black is the night</span></div></footer>
 <noscript><div class="wrap"><p>JavaScript is off. The portfolio text is available above; charts need JavaScript. <a href="data.json">Read the training aggregate</a>.</p></div></noscript>
 <script>
 /* ---------- theme: auto by sun, manual override ---------- */
@@ -814,7 +922,7 @@ drawAll();
 // SVG titles support screen readers; native point titles retain raw values.
 for (const svg of document.querySelectorAll('#dash svg')) {
   const title=svgEl('title',{});
-  title.textContent=svg.closest('.panel').querySelector('h4').textContent;
+  title.textContent=svg.closest('.panel').querySelector('h3').textContent;
   svg.prepend(title); svg.setAttribute('role','img'); svg.setAttribute('aria-label',title.textContent);
 }
 for (const el of document.querySelectorAll('nav .links a')) if(el.classList.contains('on')) el.setAttribute('aria-current','page');
