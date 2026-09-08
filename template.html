@@ -150,12 +150,12 @@ tr:last-child td{border-bottom:none}
 #routeMaps .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);padding:10px 14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
 
 /* ---------- elevation profiles ---------- */
-#elevProfiles{margin-top:20px;display:grid;gap:14px}
-#elevProfiles .ep{border-top:1px solid var(--line);padding-top:10px}
-#elevProfiles .ep .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);display:flex;justify-content:space-between;margin-bottom:4px}
-#elevProfiles svg{display:block;width:100%;height:56px}
-#elevProfiles .fill{fill:var(--accent);opacity:.14;stroke:none}
-#elevProfiles .line{fill:none;stroke:var(--accent);stroke-width:1.4}
+#elevProfiles,#hikeElevProfiles{margin-top:20px;display:grid;gap:14px}
+#elevProfiles .ep,#hikeElevProfiles .ep{border-top:1px solid var(--line);padding-top:10px}
+#elevProfiles .ep .cap,#hikeElevProfiles .ep .cap{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);display:flex;justify-content:space-between;margin-bottom:4px}
+#elevProfiles svg,#hikeElevProfiles svg{display:block;width:100%;height:56px}
+#elevProfiles .fill,#hikeElevProfiles .fill{fill:var(--accent);opacity:.14;stroke:none}
+#elevProfiles .line,#hikeElevProfiles .line{fill:none;stroke:var(--accent);stroke-width:1.4}
 
 
 /* Portfolio additions; sibling base above is unchanged. */
@@ -186,6 +186,7 @@ svg .ln3{stroke:var(--accent);fill:none;stroke-width:1;stroke-dasharray:1 4;opac
 :focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 .skip-link{position:fixed;top:-100px;left:16px;z-index:100;background:var(--bg);padding:10px}
 .skip-link:focus{top:8px}
+.chart-scroll{overflow-x:auto;max-width:100%}
 @media(max-width:720px){.panel{padding:18px 14px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .v{font-size:21px}.kpis .s{padding:14px}#monChart,#runScatter{min-width:660px}.chart-scroll{overflow-x:auto}.brand span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body,.card{transition:none}}
 /* Shared identity layout: keep identical on .com and .me. */
@@ -274,6 +275,11 @@ section .lead{margin-left:auto;margin-right:auto}
       __SPORTS__
       <p class="goalnote">Hours use recorded timer time. Distance and ascent are sums of recorded fields only; — means unrecorded, not zero. Partial sums show their session coverage. Indoor zero distances are export values, not inferred travel. Display precision is not sensor accuracy.</p>
     </div>
+    <div class="panel" id="achievements">
+      <h4>Recorded bests / achievements</h4>
+      <p class="sub">Every number below is computed from this FIT export, not typed by hand. "Recorded" means the watch captured it; it is not a certified race result. Ties list every date.</p>
+      __ACHIEVEMENTS__
+    </div>
     <div class="qed"><a href="#data">Read the full training log →</a></div>
   </div>
 </section>
@@ -355,7 +361,7 @@ section .lead{margin-left:auto;margin-right:auto}
         </div>
         <div class="panel">
           <h4>Records &amp; structure</h4>
-          <div class="sub">fastest recorded rolling splits and support work · not race-certified</div>
+          <div class="sub">Running personal bests · fastest recorded rolling splits and support work · not race-certified or current fitness</div>
           <div class="table-scroll" tabindex="0" role="region" aria-label="Records table"><table id="prTable"></table></div>
           <div class="truth" id="truthNote"></div>
         </div>
@@ -365,7 +371,7 @@ section .lead{margin-left:auto;margin-right:auto}
     </div>
     <div id="data-mountaineering" role="tabpanel" aria-labelledby="tab-mountaineering" hidden>    <div class="panel" id="hikingPanel">
       <h4>Mountaineering / hiking</h4>
-      <p class="sub">FIT hiking sessions. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
+      <p class="sub">Mountaineering is inferred from FIT hiking and recorded ascent, not a distinct mountaineering sport. Recorded ascent, not summit elevation or a claim of technical climbing.</p>
       __HIKING__
     </div>
     </div>
@@ -378,6 +384,7 @@ section .lead{margin-left:auto;margin-right:auto}
     </div>
     </div>
     <div id="data-strength" role="tabpanel" aria-labelledby="tab-strength" hidden>
+      <div class="panel"><h3>Strength / recorded training</h3>__STRENGTH__</div>
       <div class="panel"><h3>Strength / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
@@ -387,6 +394,7 @@ section .lead{margin-left:auto;margin-right:auto}
       <div id="counts-strength" class="muscle-counts"></div></div>
     </div>
     <div id="data-mobility" role="tabpanel" aria-labelledby="tab-mobility" hidden>
+      <div class="panel"><h3>Mobility / recorded training</h3><p class="sub">Mind-and-body FIT categories are a mobility proxy, not proof of a specific mobility exercise or measured range of motion. Original sport labels are retained below.</p>__MOBILITY__</div>
       <div class="panel"><h3>Mobility / muscle heatmap</h3>
       <p class="sub">Inferred by matching workout timestamps/dates against the routine log; a programmatic estimate, not biometric measurement. Historical sessions use the approved routine union, not exercise-level FIT evidence.</p>
       <p class="sub">Intensity means attributed sessions, not force, fatigue or measured muscle activation. Equal historical intensities reflect the mapping assumption.</p>
@@ -735,6 +743,7 @@ tabs.forEach((b,i)=>{
     if(n!==null){e.preventDefault();selectDataTab(tabs[n],true);}
   });
 });
+document.querySelectorAll('[data-running-link]').forEach(a=>a.addEventListener('click',()=>selectDataTab($('tab-running'),true)));
 function muscleMap(category){
   const load=D.muscle_load[category], window=$('window-'+category).value, counts=load[window];
   const svg=$('muscles-'+category);svg.replaceChildren();

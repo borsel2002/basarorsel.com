@@ -243,8 +243,8 @@ def parse_file(path):
             dec = decoupling(ts, spds, hrs)
             if dec is not None:
                 d["dec"] = dec
-        # elevation profile for half-marathon-plus efforts: ~120 samples by distance
-        if ds[-1] >= 21000:
+        # elevation profile for half-marathon-plus efforts and hikes: ~120 samples by distance
+        if ds[-1] >= 21000 or d.get("sport") == "hiking":
             prof = [(ds[i], alts[i]) for i in range(len(ds)) if alts[i] is not None]
             if len(prof) > 20:
                 step = max(1, len(prof) // 120)
@@ -395,6 +395,22 @@ def swim_routes(ws):
     return sessions
 
 
+def hike_routes(ws):
+    """One map per hike; simplified projected GPS, no basemap."""
+    sessions = []
+    for w in ws:
+        pts = w.get('pts') or []
+        usable = [p for p in pts if len(p) == 2 and all(math.isfinite(v) for v in p)
+                  and -90 <= p[0] <= 90 and -180 <= p[1] <= 180 and p != (0, 0) and p != [0, 0]]
+        maps = build_routes([dict(w, pts=usable)], min_traces=1)['clusters'] if len(usable) >= 4 else []
+        sessions.append({'date': dt(w).date().isoformat(),
+                         'km': None if w.get('total_distance') is None else round(w['total_distance']/1000, 3),
+                         'ascent_m': w.get('total_ascent'),
+                         'map': maps[0] if maps else None,
+                         'status': None if maps else ('no GPS trace recorded' if not pts else 'no usable GPS trace recorded')})
+    return sessions
+
+
 def dt(w):
     return datetime.datetime.fromisoformat(w["start_time"])
 
@@ -440,6 +456,64 @@ def sport_summary(ws, sessions=False):
              "km": round(w["total_distance"] / 1000, 3) if w.get("total_distance") is not None else None,
              "ascent_m": w.get("total_ascent"), "duration_s": w.get("total_timer_time")}
             for w in ws]
+    return out
+
+
+def discipline_summary(ws):
+    """Recorded receipts; calendar periods use Europe/Istanbul, including ISO weeks.
+
+    Pace uses paired positive distance/timer measurements, never separate totals.
+    Best ties retain every date; missing measurements never compete as zero.
+    """
+    from zoneinfo import ZoneInfo
+    zone = ZoneInfo('Europe/Istanbul')
+    out = sport_summary(ws)
+    rows = []
+    for w in ws:
+        distance, seconds = w.get('total_distance'), w.get('total_timer_time')
+        rows.append(dict(date=dt(w).astimezone(zone).date().isoformat(),
+                         start_time=w['start_time'], sport=w.get('sport'), sub_sport=w.get('sub_sport'),
+                         km=distance / 1000 if distance is not None else None,
+                         duration_s=seconds, ascent_m=w.get('total_ascent'),
+                         pace_s_100m=seconds * 100 / distance
+                         if distance is not None and distance > 0 and seconds is not None and seconds > 0 else None))
+    out['sessions'] = sorted(rows, key=lambda r: r['start_time'])
+    out['timezone'] = 'Europe/Istanbul'
+    paired = [r for r in rows if r['pace_s_100m'] is not None]
+    out['pace_recorded'] = len(paired)
+    out['pace_s_100m'] = (sum(r['duration_s'] for r in paired) / sum(r['km'] for r in paired) / 10) if paired else None
+    def best(items, field, smallest=False):
+        eligible = [r for r in items if r.get(field) is not None]
+        if not eligible:
+            return None
+        value = (min if smallest else max)(r[field] for r in eligible)
+        return {'value': value, 'dates': [r['date'] for r in eligible if r[field] == value],
+                'recorded': len(eligible), 'total': len(items),
+                'winning_coverage': [{'date': r['date'], 'recorded': r['recorded'][field], 'total': r['count']}
+                                     for r in eligible if r[field] == value and 'recorded' in r and field in r['recorded']]}
+    periods = {}
+    for period in ('weekly', 'monthly', 'daily'):
+        groups = collections.defaultdict(list)
+        for row in rows:
+            day = datetime.date.fromisoformat(row['date'])
+            key = ((day - datetime.timedelta(days=day.weekday())).isoformat() if period == 'weekly'
+                   else day.strftime('%Y-%m') if period == 'monthly' else day.isoformat())
+            groups[key].append(row)
+        periods[period] = []
+        for date, group in sorted(groups.items()):
+            entry = {'date': date, 'count': len(group), 'recorded': {}}
+            for field in ('duration_s', 'km', 'ascent_m'):
+                vals = [r[field] for r in group if r[field] is not None]
+                entry[field] = sum(vals) if vals else None
+                entry['recorded'][field] = len(vals)
+            periods[period].append(entry)
+    out.update(periods)
+    out['bests'] = {'longest_distance': best(rows, 'km'), 'longest_session': best(rows, 'duration_s'),
+                    'fastest_pace': best(rows, 'pace_s_100m', True),
+                    'biggest_ascent': best(rows, 'ascent_m'),
+                    'biggest_ascent_day': best(periods['daily'], 'ascent_m'),
+                    'most_sessions_week': best(periods['weekly'], 'count'),
+                    'most_sessions_month': best(periods['monthly'], 'count')}
     return out
 
 
@@ -613,11 +687,17 @@ def aggregate(parsed):
         "generated": datetime.date.today().isoformat(),
         "meta": {"files": len(parsed), "unique": len(ws)},
         "sports": sports,
+        "disciplines": {name: discipline_summary(items) for name, items in
+                        (("mountaineering", hikes), ("swim", swims), ("strength", strength),
+                         ("mobility", mind))} | {"swim_run": sport_summary(swims + runs)},
         "muscle_load": muscle_summary(ws, load_routine_rules()),
         "routine_method": "Muscle exposure inferred by matching workout timestamps/dates against routines.md; historical sessions use the approved routine union. Programmatic estimate, not biometric measurement.",
         "hiking": sport_summary(hikes, sessions=True),
         "swim": sport_summary(swims, sessions=True),
         "swim_routes": swim_routes(swims),
+        "hike_routes": hike_routes(hikes),
+        "hike_profiles": [{"d": dt(w).strftime("%Y-%m-%d"), "elev": w.get("elev")}
+                          for w in hikes if w.get("elev")],
         "totals": {
             "workouts": len(ws),
             "hours": round(sum(w.get("total_timer_time", 0) for w in ws) / 3600),
